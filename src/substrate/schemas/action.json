@@ -1,0 +1,11 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ActionRequest",
+  "type": "object",
+  "properties": {
+    "action": { "type": "string" },
+    "params": { "type": "object" }
+  },
+  "required": ["action", "params"],
+  "additionalProperties": false
+}
