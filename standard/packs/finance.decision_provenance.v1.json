@@ -1,0 +1,135 @@
+{
+  "meta": {
+    "id": "finance.00001.decision_provenance.v1",
+    "version": "1.0.0",
+    "domain": "governance",
+    "label": "Decision Provenance Pack",
+    "description": "Deterministic decision lineage tracking for all automated financial workflows.",
+    "eu_ai_act": ["Art. 12", "Art. 13"]
+  },
+  "io": {
+    "inputs": [
+      "event_stream",
+      "model_output",
+      "human_override",
+      "context_metadata"
+    ],
+    "outputs": [
+      "provenance_record",
+      "provenance_index"
+    ],
+    "replay_key": "decision_id"
+  },
+  "workflow": {
+    "states": [
+      "ingest",
+      "normalize",
+      "link_entities",
+      "validate_integrity",
+      "seal_record"
+    ],
+    "initial_state": "ingest",
+    "terminal_states": ["seal_record"],
+    "transitions": [
+      {
+        "from": "ingest",
+        "to": "normalize",
+        "on": "events_collected"
+      },
+      {
+        "from": "normalize",
+        "to": "link_entities",
+        "on": "normalized_ok"
+      },
+      {
+        "from": "link_entities",
+        "to": "validate_integrity",
+        "on": "linking_ok"
+      },
+      {
+        "from": "validate_integrity",
+        "to": "seal_record",
+        "on": "integrity_ok"
+      }
+    ],
+    "guards": [
+      {
+        "name": "no_missing_steps",
+        "applies_to": "validate_integrity",
+        "expression": "all_required_events_present(decision_id)"
+      },
+      {
+        "name": "timestamp_monotonic",
+        "applies_to": "validate_integrity",
+        "expression": "timestamps_monotonic(decision_id)"
+      },
+      {
+        "name": "identity_bound",
+        "applies_to": "link_entities",
+        "expression": "all_actors_have_identity(decision_id)"
+      }
+    ]
+  },
+  "governance": {
+    "validators": [
+      {
+        "id": "prov.schema",
+        "type": "schema",
+        "target": "provenance_record",
+        "spec_ref": "schemas/finance/decision_provenance_v1.json"
+      },
+      {
+        "id": "prov.completeness",
+        "type": "custom",
+        "target": "event_stream",
+        "function": "validate_decision_completeness"
+      }
+    ],
+    "risk_checks": [
+      {
+        "id": "prov.gap_detection",
+        "severity": "high",
+        "expression": "missing_required_event(decision_id)"
+      }
+    ],
+    "approvals": [
+      {
+        "id": "prov.override_approval",
+        "trigger": "human_override_present",
+        "required_roles": ["risk_officer", "product_owner"]
+      }
+    ]
+  },
+  "evidence": {
+    "logs": [
+      {
+        "id": "prov.timeline",
+        "source": "event_stream",
+        "format": "timeline",
+        "indexed_by": ["decision_id", "actor_id"]
+      }
+    ],
+    "artifacts": [
+      {
+        "id": "prov.snapshot",
+        "type": "json",
+        "content_ref": "provenance_record",
+        "hash_algorithm": "sha256"
+      }
+    ],
+    "retention": {
+      "policy_id": "finance.default_7y",
+      "min_years": 7
+    }
+  },
+  "integration": {
+    "event_bindings": [
+      {
+        "on_event": "decision.completed",
+        "handler": "build_provenance_record"
+      }
+    ],
+    "topics": ["governance", "provenance", "audit"],
+    "tags": ["high_risk", "replayable"]
+  }
+}

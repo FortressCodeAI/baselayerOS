@@ -1,0 +1,131 @@
+{
+  "meta": {
+    "id": "finance.00005.model_governance.v1",
+    "version": "1.0.0",
+    "domain": "model",
+    "label": "Model Governance Pack",
+    "description": "Model registration, validation, drift detection, and deterministic rollback.",
+    "eu_ai_act": ["Art. 15"]
+  },
+  "io": {
+    "inputs": [
+      "model_registration",
+      "validation_results",
+      "performance_metrics",
+      "drift_signal",
+      "rollback_request"
+    ],
+    "outputs": [
+      "model_card",
+      "deployment_status",
+      "drift_alert"
+    ],
+    "replay_key": "model_id"
+  },
+  "workflow": {
+    "states": [
+      "registered",
+      "under_validation",
+      "approved",
+      "deployed",
+      "under_drift_investigation",
+      "rolled_back"
+    ],
+    "initial_state": "registered",
+    "terminal_states": ["rolled_back"],
+    "transitions": [
+      {
+        "from": "registered",
+        "to": "under_validation",
+        "on": "validation_started"
+      },
+      {
+        "from": "under_validation",
+        "to": "approved",
+        "on": "validation_passed"
+      },
+      {
+        "from": "approved",
+        "to": "deployed",
+        "on": "deployment_started"
+      },
+      {
+        "from": "deployed",
+        "to": "under_drift_investigation",
+        "on": "drift_signal_detected"
+      },
+      {
+        "from": "under_drift_investigation",
+        "to": "rolled_back",
+        "on": "rollback_approved"
+      }
+    ],
+    "guards": [
+      {
+        "name": "no_deploy_without_validation",
+        "applies_to": "deployed",
+        "expression": "validation_results_passed(model_id)"
+      }
+    ]
+  },
+  "governance": {
+    "validators": [
+      {
+        "id": "model.registration_schema",
+        "type": "schema",
+        "target": "model_registration",
+        "spec_ref": "schemas/finance/model_registration_v1.json"
+      }
+    ],
+    "risk_checks": [
+      {
+        "id": "model.drift_threshold",
+        "severity": "high",
+        "expression": "drift_score > drift_threshold"
+      }
+    ],
+    "approvals": [
+      {
+        "id": "model.rollback_approval",
+        "trigger": "rollback_request",
+        "required_roles": ["model_risk", "business_owner"]
+      }
+    ]
+  },
+  "evidence": {
+    "logs": [
+      {
+        "id": "model.performance_log",
+        "source": "performance_metrics",
+        "format": "time_series",
+        "indexed_by": ["model_id"]
+      }
+    ],
+    "artifacts": [
+      {
+        "id": "model.card",
+        "type": "json",
+        "content_ref": "model_card",
+        "hash_algorithm": "sha256"
+      }
+    ],
+    "retention": {
+      "policy_id": "finance.default_7y",
+      "min_years": 7
+    }
+  },
+  "integration": {
+    "event_bindings": [
+      {
+        "on_event": "model.registered",
+        "handler": "start_model_governance"
+      },
+      {
+        "on_event": "model.drift_detected",
+        "handler": "open_drift_investigation"
+      }
+    ],
+    "topics": ["model", "governance", "drift"],
+    "tags": ["high_risk", "critical"]
+  }
+}

@@ -1,0 +1,130 @@
+{
+  "meta": {
+    "id": "finance.00002.lifecycle_governance.v1",
+    "version": "1.0.0",
+    "domain": "governance",
+    "label": "Lifecycle Governance Pack",
+    "description": "Full lifecycle control for financial AI systems: creation → deployment → monitoring → retirement.",
+    "eu_ai_act": ["Art. 9", "Art. 14"]
+  },
+  "io": {
+    "inputs": [
+      "system_registration",
+      "risk_assessment",
+      "deployment_request",
+      "monitoring_metrics",
+      "retirement_request"
+    ],
+    "outputs": [
+      "lifecycle_state",
+      "lifecycle_log"
+    ],
+    "replay_key": "system_id"
+  },
+  "workflow": {
+    "states": [
+      "registered",
+      "risk_review",
+      "pre_deployment",
+      "in_production",
+      "under_monitoring",
+      "retired"
+    ],
+    "initial_state": "registered",
+    "terminal_states": ["retired"],
+    "transitions": [
+      {
+        "from": "registered",
+        "to": "risk_review",
+        "on": "risk_assessment_submitted"
+      },
+      {
+        "from": "risk_review",
+        "to": "pre_deployment",
+        "on": "risk_approved"
+      },
+      {
+        "from": "pre_deployment",
+        "to": "in_production",
+        "on": "deployment_approved"
+      },
+      {
+        "from": "in_production",
+        "to": "under_monitoring",
+        "on": "go_live"
+      },
+      {
+        "from": "under_monitoring",
+        "to": "retired",
+        "on": "retirement_approved"
+      }
+    ],
+    "guards": [
+      {
+        "name": "high_risk_requires_board",
+        "applies_to": "risk_review",
+        "expression": "if risk_level == 'high' then board_approval_present()"
+      }
+    ]
+  },
+  "governance": {
+    "validators": [
+      {
+        "id": "lc.registration_schema",
+        "type": "schema",
+        "target": "system_registration",
+        "spec_ref": "schemas/finance/system_registration_v1.json"
+      }
+    ],
+    "risk_checks": [
+      {
+        "id": "lc.missing_monitoring",
+        "severity": "high",
+        "expression": "monitoring_plan_absent(system_id)"
+      }
+    ],
+    "approvals": [
+      {
+        "id": "lc.deployment_approval",
+        "trigger": "deployment_request",
+        "required_roles": ["model_risk", "it_ops", "business_owner"]
+      }
+    ]
+  },
+  "evidence": {
+    "logs": [
+      {
+        "id": "lc.state_changes",
+        "source": "lifecycle_state",
+        "format": "state_transition_log",
+        "indexed_by": ["system_id"]
+      }
+    ],
+    "artifacts": [
+      {
+        "id": "lc.risk_dossier",
+        "type": "pdf",
+        "content_ref": "risk_assessment",
+        "hash_algorithm": "sha256"
+      }
+    ],
+    "retention": {
+      "policy_id": "finance.default_7y",
+      "min_years": 7
+    }
+  },
+  "integration": {
+    "event_bindings": [
+      {
+        "on_event": "system.registered",
+        "handler": "start_lifecycle"
+      },
+      {
+        "on_event": "system.retirement_requested",
+        "handler": "evaluate_retirement"
+      }
+    ],
+    "topics": ["governance", "lifecycle"],
+    "tags": ["high_risk", "board_visible"]
+  }
+}

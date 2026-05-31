@@ -1,0 +1,78 @@
+workflow:
+  id: "hiring_screening_v1"
+  version: "1.0.0"
+  name: "Hiring Screening Workflow"
+  description: "Deterministic workflow for evaluating job applicants with fairness and compliance constraints."
+
+  inputs:
+    type: object
+    properties:
+      applicant_id:
+        type: string
+      resume_text:
+        type: string
+      years_experience:
+        type: number
+      education_level:
+        type: string
+    required:
+      - applicant_id
+      - resume_text
+      - years_experience
+      - education_level
+
+  outputs:
+    type: object
+    properties:
+      score:
+        type: number
+      decision:
+        type: string
+      explanation:
+        type: string
+
+  steps:
+    - id: "extract_features"
+      name: "Extract Features"
+      type: "module"
+      module_id: "employment.feature_extractor"
+      module_action: "extract"
+      input_mapping:
+        resume_text: "$.resume_text"
+        years_experience: "$.years_experience"
+        education_level: "$.education_level"
+      output_mapping:
+        features: "$.features"
+
+    - id: "score_applicant"
+      name: "Score Applicant"
+      type: "module"
+      module_id: "employment.scoring_model"
+      module_action: "score"
+      input_mapping:
+        features: "$.features"
+      output_mapping:
+        score: "$.score"
+
+    - id: "fairness_check"
+      name: "Fairness Check"
+      type: "module"
+      module_id: "compliance.fairness_checker"
+      module_action: "validate"
+      input_mapping:
+        applicant_id: "$.applicant_id"
+        score: "$.score"
+      output_mapping:
+        fairness_passed: "$.fairness_passed"
+      on_failure: "halt"
+
+    - id: "decision_logic"
+      name: "Decision Logic"
+      type: "decision"
+      input_mapping:
+        score: "$.score"
+        fairness_passed: "$.fairness_passed"
+      output_mapping:
+        decision: "$.decision"
+        explanation: "$.explanation"
+      on_failure: "halt"

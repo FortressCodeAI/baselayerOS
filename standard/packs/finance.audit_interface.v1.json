@@ -1,0 +1,125 @@
+{
+  "meta": {
+    "id": "finance.audit_interface.v1",
+    "version": "1.0.0",
+    "domain": "compliance",
+    "label": "Audit & Regulator Interface Pack",
+    "description": "Deterministic export of audit artifacts, regulator dashboards, and evidence bundles.",
+    "eu_ai_act": ["Art. 12", "Art. 43"]
+  },
+  "io": {
+    "inputs": [
+      "audit_request",
+      "regulator_questionnaire",
+      "evidence_references"
+    ],
+    "outputs": [
+      "audit_bundle",
+      "regulator_response_package",
+      "access_audit_log"
+    ],
+    "replay_key": "audit_id"
+  },
+  "workflow": {
+    "states": [
+      "request_received",
+      "scope_defined",
+      "evidence_collected",
+      "package_assembled",
+      "submitted",
+      "closed"
+    ],
+    "initial_state": "request_received",
+    "terminal_states": ["closed"],
+    "transitions": [
+      {
+        "from": "request_received",
+        "to": "scope_defined",
+        "on": "scope_agreed"
+      },
+      {
+        "from": "scope_defined",
+        "to": "evidence_collected",
+        "on": "evidence_collection_started"
+      },
+      {
+        "from": "evidence_collected",
+        "to": "package_assembled",
+        "on": "assembly_started"
+      },
+      {
+        "from": "package_assembled",
+        "to": "submitted",
+        "on": "package_submitted"
+      },
+      {
+        "from": "submitted",
+        "to": "closed",
+        "on": "audit_closed"
+      }
+    ],
+    "guards": [
+      {
+        "name": "no_submission_without_minimum_evidence",
+        "applies_to": "submitted",
+        "expression": "evidence_references_count(audit_id) >= minimum_required_evidence()"
+      }
+    ]
+  },
+  "governance": {
+    "validators": [
+      {
+        "id": "audit.request_schema",
+        "type": "schema",
+        "target": "audit_request",
+        "spec_ref": "schemas/finance/audit_request_v1.json"
+      }
+    ],
+    "risk_checks": [
+      {
+        "id": "audit.frequent_regulator_queries",
+        "severity": "medium",
+        "expression": "regulator_queries_last_12m() > query_threshold"
+      }
+    ],
+    "approvals": [
+      {
+        "id": "audit.submission_approval",
+        "trigger": "package_submitted",
+        "required_roles": ["head_of_compliance", "legal_counsel"]
+      }
+    ]
+  },
+  "evidence": {
+    "logs": [
+      {
+        "id": "audit.access_log",
+        "source": "access_audit_log",
+        "format": "access_log",
+        "indexed_by": ["audit_id", "user_id"]
+      }
+    ],
+    "artifacts": [
+      {
+        "id": "audit.bundle_archive",
+        "type": "archive",
+        "content_ref": "audit_bundle",
+        "hash_algorithm": "sha256"
+      }
+    ],
+    "retention": {
+      "policy_id": "finance.audit_10y",
+      "min_years": 10
+    }
+  },
+  "integration": {
+    "event_bindings": [
+      {
+        "on_event": "regulator.request_received",
+        "handler": "start_audit_interface_flow"
+      }
+    ],
+    "topics": ["audit", "regulator"],
+    "tags": ["regulator_facing", "evidence_export"]
+  }
+}

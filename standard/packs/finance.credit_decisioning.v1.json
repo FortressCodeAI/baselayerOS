@@ -1,0 +1,138 @@
+{
+  "meta": {
+    "id": "finance.credit_decisioning.v1",
+    "version": "1.0.0",
+    "domain": "decisioning",
+    "label": "Credit Decisioning Governance Pack",
+    "description": "Deterministic credit scoring, overrides, appeals, and fairness evidence.",
+    "eu_ai_act": ["Art. 10", "Art. 12"]
+  },
+  "io": {
+    "inputs": [
+      "application_data",
+      "credit_bureau_data",
+      "credit_model_output",
+      "manual_override",
+      "appeal_request"
+    ],
+    "outputs": [
+      "credit_decision",
+      "adverse_action_notice",
+      "appeal_outcome"
+    ],
+    "replay_key": "application_id"
+  },
+  "workflow": {
+    "states": [
+      "submitted",
+      "auto_decisioned",
+      "under_manual_review",
+      "approved",
+      "declined",
+      "appeal_open",
+      "appeal_closed"
+    ],
+    "initial_state": "submitted",
+    "terminal_states": ["approved", "declined", "appeal_closed"],
+    "transitions": [
+      {
+        "from": "submitted",
+        "to": "auto_decisioned",
+        "on": "model_scored"
+      },
+      {
+        "from": "auto_decisioned",
+        "to": "under_manual_review",
+        "on": "manual_review_required"
+      },
+      {
+        "from": "auto_decisioned",
+        "to": "approved",
+        "on": "auto_approved"
+      },
+      {
+        "from": "auto_decisioned",
+        "to": "declined",
+        "on": "auto_declined"
+      },
+      {
+        "from": "approved",
+        "to": "appeal_open",
+        "on": "appeal_requested"
+      },
+      {
+        "from": "declined",
+        "to": "appeal_open",
+        "on": "appeal_requested"
+      },
+      {
+        "from": "appeal_open",
+        "to": "appeal_closed",
+        "on": "appeal_resolved"
+      }
+    ],
+    "guards": [
+      {
+        "name": "no_decline_without_reason_codes",
+        "applies_to": "declined",
+        "expression": "reason_codes_present(application_id)"
+      }
+    ]
+  },
+  "governance": {
+    "validators": [
+      {
+        "id": "credit.application_schema",
+        "type": "schema",
+        "target": "application_data",
+        "spec_ref": "schemas/finance/credit_application_v1.json"
+      }
+    ],
+    "risk_checks": [
+      {
+        "id": "credit.fairness_check",
+        "severity": "high",
+        "expression": "fairness_metric < fairness_threshold"
+      }
+    ],
+    "approvals": [
+      {
+        "id": "credit.large_override_approval",
+        "trigger": "manual_override",
+        "required_roles": ["credit_officer"]
+      }
+    ]
+  },
+  "evidence": {
+    "logs": [
+      {
+        "id": "credit.decision_log",
+        "source": "credit_decision",
+        "format": "decision_log",
+        "indexed_by": ["application_id", "customer_id"]
+      }
+    ],
+    "artifacts": [
+      {
+        "id": "credit.adverse_action_notice_doc",
+        "type": "pdf",
+        "content_ref": "adverse_action_notice",
+        "hash_algorithm": "sha256"
+      }
+    ],
+    "retention": {
+      "policy_id": "finance.credit_7y",
+      "min_years": 7
+    }
+  },
+  "integration": {
+    "event_bindings": [
+      {
+        "on_event": "credit.application_submitted",
+        "handler": "run_credit_decisioning"
+      }
+    ],
+    "topics": ["credit", "decisioning"],
+    "tags": ["high_risk", "consumer_impact"]
+  }
+}

@@ -1,0 +1,136 @@
+{
+  "meta": {
+    "id": "finance.human_oversight.v1",
+    "version": "1.0.0",
+    "domain": "governance",
+    "label": "Human Oversight & Appeals Pack",
+    "description": "Human-in-the-loop controls, override workflows, and appeal resolution.",
+    "eu_ai_act": ["Art. 14"]
+  },
+  "io": {
+    "inputs": [
+      "automated_decision",
+      "override_request",
+      "appeal_request",
+      "oversight_policy"
+    ],
+    "outputs": [
+      "override_decision",
+      "appeal_decision",
+      "oversight_log"
+    ],
+    "replay_key": "decision_id"
+  },
+  "workflow": {
+    "states": [
+      "auto_decision_issued",
+      "override_pending",
+      "override_review",
+      "override_resolved",
+      "appeal_pending",
+      "appeal_review",
+      "appeal_resolved"
+    ],
+    "initial_state": "auto_decision_issued",
+    "terminal_states": ["override_resolved", "appeal_resolved"],
+    "transitions": [
+      {
+        "from": "auto_decision_issued",
+        "to": "override_pending",
+        "on": "override_requested"
+      },
+      {
+        "from": "override_pending",
+        "to": "override_review",
+        "on": "reviewer_assigned"
+      },
+      {
+        "from": "override_review",
+        "to": "override_resolved",
+        "on": "override_decided"
+      },
+      {
+        "from": "auto_decision_issued",
+        "to": "appeal_pending",
+        "on": "appeal_requested"
+      },
+      {
+        "from": "appeal_pending",
+        "to": "appeal_review",
+        "on": "appeal_reviewer_assigned"
+      },
+      {
+        "from": "appeal_review",
+        "to": "appeal_resolved",
+        "on": "appeal_decided"
+      }
+    ],
+    "guards": [
+      {
+        "name": "no_self_review",
+        "applies_to": "override_review",
+        "expression": "reviewer_id != original_decider_id"
+      }
+    ]
+  },
+  "governance": {
+    "validators": [
+      {
+        "id": "oversight.policy_schema",
+        "type": "schema",
+        "target": "oversight_policy",
+        "spec_ref": "schemas/finance/oversight_policy_v1.json"
+      }
+    ],
+    "risk_checks": [
+      {
+        "id": "oversight.excessive_overrides",
+        "severity": "medium",
+        "expression": "override_rate(decision_type) > override_threshold"
+      }
+    ],
+    "approvals": [
+      {
+        "id": "oversight.appeal_approval",
+        "trigger": "appeal_decided",
+        "required_roles": ["appeals_officer"]
+      }
+    ]
+  },
+  "evidence": {
+    "logs": [
+      {
+        "id": "oversight.log",
+        "source": "oversight_log",
+        "format": "timeline",
+        "indexed_by": ["decision_id", "customer_id"]
+      }
+    ],
+    "artifacts": [
+      {
+        "id": "oversight.decision_bundle",
+        "type": "json",
+        "content_ref": [
+          "automated_decision",
+          "override_decision",
+          "appeal_decision"
+        ],
+        "hash_algorithm": "sha256"
+      }
+    ],
+    "retention": {
+      "policy_id": "finance.default_7y",
+      "min_years": 7
+    }
+  },
+  "integration": {
+    "event_bindings": [
+      {
+        "on_event": "decision.issued",
+        "handler": "enable_oversight_window"
+      }
+    ],
+    "topics": ["oversight", "appeals"],
+    "tags": ["human_in_the_loop", "consumer_impact"]
+  }
+}

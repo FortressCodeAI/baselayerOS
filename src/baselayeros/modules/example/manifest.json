@@ -1,0 +1,6 @@
+{
+  "name": "credit_risk",
+  "version": "1.0.0",
+  "hash": "sha256:2f9c3e8b5a0f4c0d8f4e1a9c2b7e1d9c1f4a8e2d9c3b7a1f0d2c9e3b1a7f5c2d",
+  "description": "Deterministic credit risk evaluation module. Produces APPROVED, REVIEW, or DECLINED based on fixed rules. Fully auditable and compliant with Article 14 human oversight requirements."
+}

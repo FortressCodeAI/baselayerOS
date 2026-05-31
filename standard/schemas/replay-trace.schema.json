@@ -1,0 +1,156 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://baselayeros.org/schemas/replay-trace.schema.json",
+  "title": "Replay Trace",
+  "description": "Schema for BaseLayerOS deterministic replay traces.",
+  "type": "object",
+  "required": [
+    "trace_id",
+    "workflow_id",
+    "workflow_version",
+    "created_at",
+    "input",
+    "environment",
+    "versions",
+    "steps",
+    "output",
+    "hashes"
+  ],
+  "properties": {
+    "trace_id": {
+      "type": "string",
+      "description": "Unique identifier for the trace."
+    },
+    "workflow_id": {
+      "type": "string",
+      "description": "Workflow identifier."
+    },
+    "workflow_version": {
+      "type": "string",
+      "description": "Workflow version."
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when the trace was created."
+    },
+    "input": {
+      "type": "object",
+      "description": "Original workflow input payload."
+    },
+    "environment": {
+      "type": "object",
+      "description": "Execution environment configuration."
+    },
+    "versions": {
+      "type": "object",
+      "required": ["modules", "models", "datasets"],
+      "properties": {
+        "modules": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Module versions keyed by module ID."
+        },
+        "models": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Model versions keyed by model ID."
+        },
+        "datasets": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Dataset versions keyed by dataset ID."
+        }
+      }
+    },
+    "steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "step_id",
+          "name",
+          "started_at",
+          "ended_at",
+          "input_state",
+          "output_state",
+          "modules_called",
+          "external_calls",
+          "status"
+        ],
+        "properties": {
+          "step_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "started_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "ended_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "input_state": {
+            "type": "object"
+          },
+          "output_state": {
+            "type": "object"
+          },
+          "modules_called": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["module_id", "version", "input", "output"],
+              "properties": {
+                "module_id": { "type": "string" },
+                "version": { "type": "string" },
+                "input": { "type": "object" },
+                "output": { "type": "object" }
+              }
+            }
+          },
+          "external_calls": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["request", "response"],
+              "properties": {
+                "request": { "type": "object" },
+                "response": { "type": "object" }
+              }
+            }
+          },
+          "status": {
+            "type": "string",
+            "enum": ["SUCCESS", "FAILURE"]
+          },
+          "error": {
+            "type": ["object", "null"]
+          }
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "description": "Final workflow output."
+    },
+    "hashes": {
+      "type": "object",
+      "required": ["input_hash", "output_hash", "trace_hash"],
+      "properties": {
+        "input_hash": { "type": "string" },
+        "output_hash": { "type": "string" },
+        "trace_hash": { "type": "string" }
+      }
+    }
+  }
+}

@@ -1,0 +1,120 @@
+{
+  "meta": {
+    "id": "finance.payments_governance.v1",
+    "version": "1.0.0",
+    "domain": "operations",
+    "label": "Payments Governance Pack",
+    "description": "Deterministic governance for automated payment routing, approvals, and anomaly detection.",
+    "eu_ai_act": ["Art. 12"]
+  },
+  "io": {
+    "inputs": [
+      "payment_instruction",
+      "beneficiary_data",
+      "routing_decision",
+      "anomaly_signal"
+    ],
+    "outputs": [
+      "payment_approval",
+      "payment_block",
+      "routing_audit_record"
+    ],
+    "replay_key": "payment_id"
+  },
+  "workflow": {
+    "states": [
+      "initiated",
+      "screened",
+      "approved",
+      "blocked",
+      "executed"
+    ],
+    "initial_state": "initiated",
+    "terminal_states": ["blocked", "executed"],
+    "transitions": [
+      {
+        "from": "initiated",
+        "to": "screened",
+        "on": "screening_completed"
+      },
+      {
+        "from": "screened",
+        "to": "approved",
+        "on": "screening_passed"
+      },
+      {
+        "from": "screened",
+        "to": "blocked",
+        "on": "screening_failed"
+      },
+      {
+        "from": "approved",
+        "to": "executed",
+        "on": "payment_sent"
+      }
+    ],
+    "guards": [
+      {
+        "name": "large_payment_requires_dual_control",
+        "applies_to": "approved",
+        "expression": "if amount > dual_control_threshold() then dual_approval_present()"
+      }
+    ]
+  },
+  "governance": {
+    "validators": [
+      {
+        "id": "pay.instruction_schema",
+        "type": "schema",
+        "target": "payment_instruction",
+        "spec_ref": "schemas/finance/payment_instruction_v1.json"
+      }
+    ],
+    "risk_checks": [
+      {
+        "id": "pay.anomaly_check",
+        "severity": "high",
+        "expression": "anomaly_signal == true"
+      }
+    ],
+    "approvals": [
+      {
+        "id": "pay.manual_release_approval",
+        "trigger": "payment_block",
+        "required_roles": ["payments_manager"]
+      }
+    ]
+  },
+  "evidence": {
+    "logs": [
+      {
+        "id": "pay.routing_log",
+        "source": "routing_audit_record",
+        "format": "routing_log",
+        "indexed_by": ["payment_id"]
+      }
+    ],
+    "artifacts": [
+      {
+        "id": "pay.execution_receipt",
+        "type": "json",
+        "content_ref": "payment_approval",
+        "hash_algorithm": "sha256"
+      }
+    ],
+    "retention": {
+      "policy_id": "finance.payments_7y",
+      "min_years": 7
+    }
+  },
+  "integration": {
+    "event_bindings": [
+      {
+        "on_event": "payment.initiated",
+        "handler": "govern_payment_flow"
+      }
+    ],
+    "topics": ["payments", "operations"],
+    "tags": ["dual_control", "screening"]
+  }
+}

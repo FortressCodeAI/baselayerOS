@@ -1,0 +1,123 @@
+{
+  "meta": {
+    "id": "finance.00008.fraud_governance.v1",
+    "version": "1.0.0",
+    "domain": "risk",
+    "label": "Fraud Detection Governance Pack",
+    "description": "Governance wrapper for fraud detection systems with deterministic replay.",
+    "eu_ai_act": ["Art. 9", "Art. 15"]
+  },
+  "io": {
+    "inputs": [
+      "transaction_event",
+      "fraud_model_output",
+      "manual_review_decision"
+    ],
+    "outputs": [
+      "fraud_flag",
+      "case_record",
+      "review_outcome"
+    ],
+    "replay_key": "transaction_id"
+  },
+  "workflow": {
+    "states": [
+      "screening",
+      "flagged",
+      "under_review",
+      "cleared",
+      "confirmed_fraud"
+    ],
+    "initial_state": "screening",
+    "terminal_states": ["cleared", "confirmed_fraud"],
+    "transitions": [
+      {
+        "from": "screening",
+        "to": "flagged",
+        "on": "fraud_score_above_threshold"
+      },
+      {
+        "from": "flagged",
+        "to": "under_review",
+        "on": "case_opened"
+      },
+      {
+        "from": "under_review",
+        "to": "cleared",
+        "on": "review_cleared"
+      },
+      {
+        "from": "under_review",
+        "to": "confirmed_fraud",
+        "on": "review_confirmed_fraud"
+      }
+    ],
+    "guards": [
+      {
+        "name": "high_value_requires_human_review",
+        "applies_to": "flagged",
+        "expression": "if transaction_amount > high_value_threshold() then manual_review_required()"
+      }
+    ]
+  },
+  "governance": {
+    "validators": [
+      {
+        "id": "fraud.tx_schema",
+        "type": "schema",
+        "target": "transaction_event",
+        "spec_ref": "schemas/finance/transaction_event_v1.json"
+      }
+    ],
+    "risk_checks": [
+      {
+        "id": "fraud.model_bias_check",
+        "severity": "medium",
+        "expression": "disparate_impact_score > bias_threshold"
+      }
+    ],
+    "approvals": [
+      {
+        "id": "fraud.writeoff_approval",
+        "trigger": "confirmed_fraud",
+        "required_roles": ["fraud_manager", "finance_controller"]
+      }
+    ]
+  },
+  "evidence": {
+    "logs": [
+      {
+        "id": "fraud.case_log",
+        "source": "case_record",
+        "format": "timeline",
+        "indexed_by": ["transaction_id", "customer_id"]
+      }
+    ],
+    "artifacts": [
+      {
+        "id": "fraud.replay_bundle",
+        "type": "json",
+        "content_ref": [
+          "transaction_event",
+          "fraud_model_output",
+          "manual_review_decision"
+        ],
+        "hash_algorithm": "sha256"
+      }
+    ],
+    "retention": {
+      "policy_id": "finance.default_7y",
+      "min_years": 7
+    }
+  },
+  "integration": {
+    "event_bindings": [
+      {
+        "on_event": "transaction.posted",
+        "handler": "run_fraud_screening"
+      }
+    ],
+    "topics": ["fraud", "risk"],
+    "tags": ["replayable", "high_risk"]
+  }
+}

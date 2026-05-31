@@ -1,0 +1,67 @@
+workflow:
+  id: "credit_risk_assessment_v1"
+  version: "1.0.0"
+  name: "Credit Risk Assessment"
+  description: "Deterministic workflow for evaluating credit risk for loan applicants."
+
+  inputs:
+    type: object
+    properties:
+      applicant_id:
+        type: string
+      income:
+        type: number
+      credit_score:
+        type: number
+      existing_debt:
+        type: number
+    required:
+    - applicant_id
+    - income
+    - credit_score
+    - existing_debt
+
+  outputs: 
+    type: object
+    properties:
+      risk_score:
+        type: number
+      decision:
+        type: string
+      explanations:
+        type: string
+      
+  steps:
+    - id: "normalize_inputs"
+      name: "Normalize Inputs"
+      type: "transform"
+      input_mapping:
+        applicant_id: "$.applicant_id"
+        income: "$.income"
+        credit_score: $.credit_score"
+        existing_debt: "$.existing_debt"
+      output_mapping:
+        normalized: "$"
+
+    - id: "calculate_risk"
+      name: "Calculate Risk Score"
+      type: "module"
+      module_id: "finance.risk_model"
+      module_action: "score"
+      input_mapping:
+        income: "$.normalized.income"
+        credit_score: "$.normalized.credit_score"
+        existing_debt: "$.normalized.existing_debt"
+      output_mapping:
+        risk_score: "$.risk_score"
+    
+    - id: "decision_logic"
+      name: "Decision Logic"
+      type: "decision"
+      input_mapping:
+        risk_score: "$.risk_score"
+      output_mapping:
+        decision: "$.decision"
+        explanation: "$.explanation"
+      on_failure: "halt"
+      

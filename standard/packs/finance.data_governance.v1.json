@@ -1,0 +1,126 @@
+{
+  "meta": {
+    "id": "finance.00004.data_governance.v1",
+    "version": "1.0.0",
+    "domain": "data",
+    "label": "Data Governance Pack",
+    "description": "Data lineage, quality checks, retention enforcement, and deterministic access control.",
+    "eu_ai_act": ["Art. 10"]
+  },
+  "io": {
+    "inputs": [
+      "dataset_registration",
+      "data_ingest_event",
+      "access_request",
+      "retention_policy"
+    ],
+    "outputs": [
+      "data_lineage_record",
+      "quality_report",
+      "access_decision"
+    ],
+    "replay_key": "dataset_id"
+  },
+  "workflow": {
+    "states": [
+      "registered",
+      "ingesting",
+      "quality_check",
+      "available",
+      "under_retention",
+      "deleted"
+    ],
+    "initial_state": "registered",
+    "terminal_states": ["deleted"],
+    "transitions": [
+      {
+        "from": "registered",
+        "to": "ingesting",
+        "on": "data_ingest_started"
+      },
+      {
+        "from": "ingesting",
+        "to": "quality_check",
+        "on": "ingest_completed"
+      },
+      {
+        "from": "quality_check",
+        "to": "available",
+        "on": "quality_passed"
+      },
+      {
+        "from": "available",
+        "to": "under_retention",
+        "on": "retention_policy_applied"
+      },
+      {
+        "from": "under_retention",
+        "to": "deleted",
+        "on": "retention_expired"
+      }
+    ],
+    "guards": [
+      {
+        "name": "pii_requires_strict_access",
+        "applies_to": "available",
+        "expression": "if contains_pii(dataset_id) then access_model == 'least_privilege'"
+      }
+    ]
+  },
+  "governance": {
+    "validators": [
+      {
+        "id": "data.schema_registration",
+        "type": "schema",
+        "target": "dataset_registration",
+        "spec_ref": "schemas/finance/dataset_registration_v1.json"
+      }
+    ],
+    "risk_checks": [
+      {
+        "id": "data.quality_threshold",
+        "severity": "high",
+        "expression": "quality_score < 0.95"
+      }
+    ],
+    "approvals": [
+      {
+        "id": "data.access_approval",
+        "trigger": "access_request",
+        "required_roles": ["data_owner"]
+      }
+    ]
+  },
+  "evidence": {
+    "logs": [
+      {
+        "id": "data.access_log",
+        "source": "access_decision",
+        "format": "access_log",
+        "indexed_by": ["dataset_id", "user_id"]
+      }
+    ],
+    "artifacts": [
+      {
+        "id": "data.quality_report_doc",
+        "type": "json",
+        "content_ref": "quality_report",
+        "hash_algorithm": "sha256"
+      }
+    ],
+    "retention": {
+      "policy_id": "finance.data_10y",
+      "min_years": 10
+    }
+  },
+  "integration": {
+    "event_bindings": [
+      {
+        "on_event": "data.ingested",
+        "handler": "run_quality_checks"
+      }
+    ],
+    "topics": ["data", "lineage", "access_control"],
+    "tags": ["pii", "high_risk"]
+  }
+}

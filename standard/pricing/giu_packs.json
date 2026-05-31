@@ -1,0 +1,8 @@
+{
+    "currency": "CAD",
+    "packs": {
+        "GIU_STARTER_10K": { "gius": 10000, "cad": 100 },
+        "GIU_GROWTH_100K": { "gius": 100000, "cad": 900 },
+        "GIU_ENTERPRISE_1M": { "gius": 1000000, "cad": 8000 }
+    }
+}

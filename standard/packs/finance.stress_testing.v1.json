@@ -1,0 +1,120 @@
+{
+  "meta": {
+    "id": "finance.stress_testing.v1",
+    "version": "1.0.0",
+    "domain": "risk",
+    "label": "Stress Testing & Scenario Pack",
+    "description": "Deterministic scenario execution for regulatory stress tests.",
+    "eu_ai_act": ["Art. 9"]
+  },
+  "io": {
+    "inputs": [
+      "scenario_definition",
+      "portfolio_snapshot",
+      "macro_variables",
+      "model_set"
+    ],
+    "outputs": [
+      "scenario_results",
+      "loss_distribution",
+      "regulatory_report"
+    ],
+    "replay_key": "scenario_id"
+  },
+  "workflow": {
+    "states": [
+      "scenario_defined",
+      "inputs_locked",
+      "simulation_running",
+      "results_generated",
+      "reported"
+    ],
+    "initial_state": "scenario_defined",
+    "terminal_states": ["reported"],
+    "transitions": [
+      {
+        "from": "scenario_defined",
+        "to": "inputs_locked",
+        "on": "inputs_frozen"
+      },
+      {
+        "from": "inputs_locked",
+        "to": "simulation_running",
+        "on": "simulation_started"
+      },
+      {
+        "from": "simulation_running",
+        "to": "results_generated",
+        "on": "simulation_completed"
+      },
+      {
+        "from": "results_generated",
+        "to": "reported",
+        "on": "report_submitted"
+      }
+    ],
+    "guards": [
+      {
+        "name": "no_input_change_after_lock",
+        "applies_to": "simulation_running",
+        "expression": "inputs_unchanged_since_lock(scenario_id)"
+      }
+    ]
+  },
+  "governance": {
+    "validators": [
+      {
+        "id": "stress.scenario_schema",
+        "type": "schema",
+        "target": "scenario_definition",
+        "spec_ref": "schemas/finance/stress_scenario_v1.json"
+      }
+    ],
+    "risk_checks": [
+      {
+        "id": "stress.loss_threshold",
+        "severity": "high",
+        "expression": "expected_loss > loss_threshold"
+      }
+    ],
+    "approvals": [
+      {
+        "id": "stress.scenario_approval",
+        "trigger": "inputs_frozen",
+        "required_roles": ["risk_officer", "treasury"]
+      }
+    ]
+  },
+  "evidence": {
+    "logs": [
+      {
+        "id": "stress.run_log",
+        "source": "scenario_results",
+        "format": "run_log",
+        "indexed_by": ["scenario_id"]
+      }
+    ],
+    "artifacts": [
+      {
+        "id": "stress.regulatory_report_doc",
+        "type": "pdf",
+        "content_ref": "regulatory_report",
+        "hash_algorithm": "sha256"
+      }
+    ],
+    "retention": {
+      "policy_id": "finance.stress_7y",
+      "min_years": 7
+    }
+  },
+  "integration": {
+    "event_bindings": [
+      {
+        "on_event": "regulator.stress_cycle_opened",
+        "handler": "prepare_stress_scenarios"
+      }
+    ],
+    "topics": ["stress_testing", "risk"],
+    "tags": ["regulator_facing", "replayable"]
+  }
+}

@@ -1,0 +1,125 @@
+{
+  "meta": {
+    "id": "finance.trading_algo_governance.v1",
+    "version": "1.0.0",
+    "domain": "trading",
+    "label": "Trading Algorithm Governance Pack",
+    "description": "Deterministic oversight for algorithmic trading systems with replayable execution.",
+    "eu_ai_act": ["Art. 9", "Art. 15"]
+  },
+  "io": {
+    "inputs": [
+      "strategy_definition",
+      "market_data_feed",
+      "trade_signal",
+      "execution_report",
+      "kill_switch_event"
+    ],
+    "outputs": [
+      "strategy_register_entry",
+      "trade_decision_log",
+      "kill_switch_action"
+    ],
+    "replay_key": "strategy_id"
+  },
+  "workflow": {
+    "states": [
+      "strategy_registered",
+      "paper_trading",
+      "live_trading",
+      "under_investigation",
+      "suspended"
+    ],
+    "initial_state": "strategy_registered",
+    "terminal_states": ["suspended"],
+    "transitions": [
+      {
+        "from": "strategy_registered",
+        "to": "paper_trading",
+        "on": "paper_trading_started"
+      },
+      {
+        "from": "paper_trading",
+        "to": "live_trading",
+        "on": "performance_approved"
+      },
+      {
+        "from": "live_trading",
+        "to": "under_investigation",
+        "on": "anomaly_detected"
+      },
+      {
+        "from": "under_investigation",
+        "to": "suspended",
+        "on": "kill_switch_triggered"
+      }
+    ],
+    "guards": [
+      {
+        "name": "max_drawdown_guard",
+        "applies_to": "live_trading",
+        "expression": "if drawdown > max_drawdown_limit() then trigger_kill_switch()"
+      }
+    ]
+  },
+  "governance": {
+    "validators": [
+      {
+        "id": "trade.strategy_schema",
+        "type": "schema",
+        "target": "strategy_definition",
+        "spec_ref": "schemas/finance/trading_strategy_v1.json"
+      }
+    ],
+    "risk_checks": [
+      {
+        "id": "trade.position_limit_check",
+        "severity": "critical",
+        "expression": "position_size > position_limit"
+      }
+    ],
+    "approvals": [
+      {
+        "id": "trade.go_live_approval",
+        "trigger": "performance_approved",
+        "required_roles": ["head_of_trading", "risk_officer"]
+      }
+    ]
+  },
+  "evidence": {
+    "logs": [
+      {
+        "id": "trade.execution_log",
+        "source": "execution_report",
+        "format": "time_series",
+        "indexed_by": ["strategy_id", "order_id"]
+      }
+    ],
+    "artifacts": [
+      {
+        "id": "trade.replay_bundle",
+        "type": "archive",
+        "content_ref": [
+          "market_data_feed",
+          "trade_signal",
+          "execution_report"
+        ],
+        "hash_algorithm": "sha256"
+      }
+    ],
+    "retention": {
+      "policy_id": "finance.trading_5y",
+      "min_years": 5
+    }
+  },
+  "integration": {
+    "event_bindings": [
+      {
+        "on_event": "strategy.registered",
+        "handler": "start_trading_governance"
+      }
+    ],
+    "topics": ["trading", "algo"],
+    "tags": ["kill_switch", "replayable"]
+  }
+}

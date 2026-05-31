@@ -1,0 +1,126 @@
+{
+  "meta": {
+    "id": "finance.00006.conformity_assessment.v1",
+    "version": "1.0.0",
+    "domain": "compliance",
+    "label": "Conformity Assessment Pack",
+    "description": "Automated conformity assessment generation for high-risk financial systems.",
+    "eu_ai_act": ["Art. 43"]
+  },
+  "io": {
+    "inputs": [
+      "system_profile",
+      "risk_management_evidence",
+      "data_governance_evidence",
+      "model_governance_evidence",
+      "human_oversight_evidence"
+    ],
+    "outputs": [
+      "conformity_report",
+      "technical_documentation_bundle"
+    ],
+    "replay_key": "system_id"
+  },
+  "workflow": {
+    "states": [
+      "initiated",
+      "evidence_collection",
+      "gap_analysis",
+      "remediation",
+      "final_review",
+      "completed"
+    ],
+    "initial_state": "initiated",
+    "terminal_states": ["completed"],
+    "transitions": [
+      {
+        "from": "initiated",
+        "to": "evidence_collection",
+        "on": "assessment_started"
+      },
+      {
+        "from": "evidence_collection",
+        "to": "gap_analysis",
+        "on": "evidence_complete"
+      },
+      {
+        "from": "gap_analysis",
+        "to": "remediation",
+        "on": "gaps_identified"
+      },
+      {
+        "from": "remediation",
+        "to": "final_review",
+        "on": "remediation_done"
+      },
+      {
+        "from": "final_review",
+        "to": "completed",
+        "on": "assessment_signed_off"
+      }
+    ],
+    "guards": [
+      {
+        "name": "no_completion_without_all_evidence",
+        "applies_to": "completed",
+        "expression": "all_required_evidence_present(system_id)"
+      }
+    ]
+  },
+  "governance": {
+    "validators": [
+      {
+        "id": "conf.system_profile_schema",
+        "type": "schema",
+        "target": "system_profile",
+        "spec_ref": "schemas/finance/system_profile_v1.json"
+      }
+    ],
+    "risk_checks": [
+      {
+        "id": "conf.missing_art_9",
+        "severity": "high",
+        "expression": "risk_management_evidence_missing(system_id)"
+      }
+    ],
+    "approvals": [
+      {
+        "id": "conf.final_signoff",
+        "trigger": "assessment_signed_off",
+        "required_roles": ["compliance_officer", "chief_risk_officer"]
+      }
+    ]
+  },
+  "evidence": {
+    "logs": [
+      {
+        "id": "conf.assessment_log",
+        "source": "conformity_report",
+        "format": "assessment_log",
+        "indexed_by": ["system_id"]
+      }
+    ],
+    "artifacts": [
+      {
+        "id": "conf.technical_doc_bundle",
+        "type": "archive",
+        "content_ref": "technical_documentation_bundle",
+        "hash_algorithm": "sha256"
+      }
+    ],
+    "retention": {
+      "policy_id": "finance.default_7y",
+      "min_years": 7
+    }
+  },
+  "integration": {
+    "event_bindings": [
+      {
+        "on_event": "system.marked_high_risk",
+        "handler": "start_conformity_assessment"
+      }
+    ],
+    "topics": ["compliance", "eu_ai_act"],
+    "tags": ["high_risk", "regulator_facing"]
+  }
+}

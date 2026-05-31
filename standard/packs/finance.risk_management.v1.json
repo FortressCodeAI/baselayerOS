@@ -1,0 +1,126 @@
+{
+  "meta": {
+    "id": "finance.00003.risk_management.v1",
+    "version": "1.0.0",
+    "domain": "risk",
+    "label": "Risk Management Pack",
+    "description": "Deterministic risk scoring, mitigation tracking, and audit-ready evidence generation.",
+    "eu_ai_act": ["Art. 9"]
+  },
+  "io": {
+    "inputs": [
+      "risk_event",
+      "control_catalog",
+      "mitigation_plan",
+      "residual_risk_assessment"
+    ],
+    "outputs": [
+      "risk_register_entry",
+      "risk_score",
+      "mitigation_status"
+    ],
+    "replay_key": "risk_id"
+  },
+  "workflow": {
+    "states": [
+      "identified",
+      "assessed",
+      "mitigation_defined",
+      "mitigation_in_progress",
+      "mitigation_complete",
+      "accepted"
+    ],
+    "initial_state": "identified",
+    "terminal_states": ["accepted"],
+    "transitions": [
+      {
+        "from": "identified",
+        "to": "assessed",
+        "on": "initial_assessment_done"
+      },
+      {
+        "from": "assessed",
+        "to": "mitigation_defined",
+        "on": "mitigation_plan_created"
+      },
+      {
+        "from": "mitigation_defined",
+        "to": "mitigation_in_progress",
+        "on": "mitigation_started"
+      },
+      {
+        "from": "mitigation_in_progress",
+        "to": "mitigation_complete",
+        "on": "controls_implemented"
+      },
+      {
+        "from": "mitigation_complete",
+        "to": "accepted",
+        "on": "residual_risk_accepted"
+      }
+    ],
+    "guards": [
+      {
+        "name": "no_acceptance_without_residual",
+        "applies_to": "accepted",
+        "expression": "residual_risk_assessment_present(risk_id)"
+      }
+    ]
+  },
+  "governance": {
+    "validators": [
+      {
+        "id": "risk.event_schema",
+        "type": "schema",
+        "target": "risk_event",
+        "spec_ref": "schemas/finance/risk_event_v1.json"
+      }
+    ],
+    "risk_checks": [
+      {
+        "id": "risk.high_unmitigated",
+        "severity": "critical",
+        "expression": "risk_score >= 80 and mitigation_status != 'complete'"
+      }
+    ],
+    "approvals": [
+      {
+        "id": "risk.acceptance_approval",
+        "trigger": "residual_risk_accepted",
+        "required_roles": ["chief_risk_officer"]
+      }
+    ]
+  },
+  "evidence": {
+    "logs": [
+      {
+        "id": "risk.timeline",
+        "source": "risk_register_entry",
+        "format": "timeline",
+        "indexed_by": ["risk_id", "system_id"]
+      }
+    ],
+    "artifacts": [
+      {
+        "id": "risk.mitigation_plan_doc",
+        "type": "document",
+        "content_ref": "mitigation_plan",
+        "hash_algorithm": "sha256"
+      }
+    ],
+    "retention": {
+      "policy_id": "finance.default_7y",
+      "min_years": 7
+    }
+  },
+  "integration": {
+    "event_bindings": [
+      {
+        "on_event": "incident.detected",
+        "handler": "create_risk_event"
+      }
+    ],
+    "topics": ["risk", "controls"],
+    "tags": ["high_risk", "board_reporting"]
+  }
+}

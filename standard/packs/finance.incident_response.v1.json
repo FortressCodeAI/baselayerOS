@@ -1,0 +1,131 @@
+{
+  "meta": {
+    "id": "finance.incident_response.v1",
+    "version": "1.0.0",
+    "domain": "operations",
+    "label": "Incident Response & Escalation Pack",
+    "description": "Deterministic incident capture, escalation routing, and regulator-ready evidence.",
+    "eu_ai_act": ["Art. 12"]
+  },
+  "io": {
+    "inputs": [
+      "incident_report",
+      "impact_assessment",
+      "root_cause_analysis",
+      "remediation_plan"
+    ],
+    "outputs": [
+      "incident_record",
+      "escalation_path",
+      "postmortem_report"
+    ],
+    "replay_key": "incident_id"
+  },
+  "workflow": {
+    "states": [
+      "reported",
+      "triaged",
+      "escalated",
+      "mitigating",
+      "resolved",
+      "postmortem_completed"
+    ],
+    "initial_state": "reported",
+    "terminal_states": ["postmortem_completed"],
+    "transitions": [
+      {
+        "from": "reported",
+        "to": "triaged",
+        "on": "triage_done"
+      },
+      {
+        "from": "triaged",
+        "to": "escalated",
+        "on": "escalation_required"
+      },
+      {
+        "from": "triaged",
+        "to": "mitigating",
+        "on": "no_escalation_needed"
+      },
+      {
+        "from": "escalated",
+        "to": "mitigating",
+        "on": "owner_assigned"
+      },
+      {
+        "from": "mitigating",
+        "to": "resolved",
+        "on": "mitigation_complete"
+      },
+      {
+        "from": "resolved",
+        "to": "postmortem_completed",
+        "on": "postmortem_signed_off"
+      }
+    ],
+    "guards": [
+      {
+        "name": "high_severity_requires_regulator_notification_check",
+        "applies_to": "triaged",
+        "expression": "if severity == 'critical' then regulator_notification_evaluated()"
+      }
+    ]
+  },
+  "governance": {
+    "validators": [
+      {
+        "id": "inc.incident_schema",
+        "type": "schema",
+        "target": "incident_report",
+        "spec_ref": "schemas/finance/incident_report_v1.json"
+      }
+    ],
+    "risk_checks": [
+      {
+        "id": "inc.repeat_incident_check",
+        "severity": "medium",
+        "expression": "similar_incidents_last_90d(incident_id) > repeat_threshold"
+      }
+    ],
+    "approvals": [
+      {
+        "id": "inc.postmortem_approval",
+        "trigger": "postmortem_signed_off",
+        "required_roles": ["incident_commander", "risk_officer"]
+      }
+    ]
+  },
+  "evidence": {
+    "logs": [
+      {
+        "id": "inc.timeline",
+        "source": "incident_record",
+        "format": "timeline",
+        "indexed_by": ["incident_id", "system_id"]
+      }
+    ],
+    "artifacts": [
+      {
+        "id": "inc.postmortem_doc",
+        "type": "pdf",
+        "content_ref": "postmortem_report",
+        "hash_algorithm": "sha256"
+      }
+    ],
+    "retention": {
+      "policy_id": "finance.incidents_7y",
+      "min_years": 7
+    }
+  },
+  "integration": {
+    "event_bindings": [
+      {
+        "on_event": "system.incident_reported",
+        "handler": "start_incident_workflow"
+      }
+    ],
+    "topics": ["incidents", "operations"],
+    "tags": ["regulator_facing", "timeline"]
+  }
+}

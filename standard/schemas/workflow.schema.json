@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://baselayeros.org/schemas/workflow.schema.json",
+  "title": "Workflow Specification",
+  "description": "Schema for BaseLayerOS deterministic workflows.",
+  "type": "object",
+  "required": ["workflow"],
+  "properties": {
+    "workflow": {
+      "type": "object",
+      "required": [
+        "id",
+        "version",
+        "name",
+        "description",
+        "inputs",
+        "outputs",
+        "steps"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Workflow identifier."
+        },
+        "version": {
+          "type": "string",
+          "description": "Workflow version."
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable workflow name."
+        },
+        "description": {
+          "type": "string",
+          "description": "Short description of the workflow."
+        },
+        "inputs": {
+          "type": "object",
+          "description": "JSON Schema fragment describing workflow inputs."
+        },
+        "outputs": {
+          "type": "object",
+          "description": "JSON Schema fragment describing workflow outputs."
+        },
+        "steps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "name", "type"],
+            "properties": {
+              "id": { "type": "string" },
+              "name": { "type": "string" },
+              "type": {
+                "type": "string",
+                "enum": ["module", "decision", "transform"]
+              },
+              "module_id": { "type": "string" },
+              "module_action": { "type": "string" },
+              "input_mapping": {
+                "type": "object",
+                "additionalProperties": true
+              },
+              "output_mapping": {
+                "type": "object",
+                "additionalProperties": true
+              },
+              "on_failure": {
+                "type": "string",
+                "enum": ["continue", "halt", "compensate"]
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

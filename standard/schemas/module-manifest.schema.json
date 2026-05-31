@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://baselayeros.org/schemas/module-manifest.schema.json",
+  "title": "Module Manifest",
+  "description": "Schema for BaseLayerOS module manifests.",
+  "type": "object",
+  "required": ["module"],
+  "properties": {
+    "module": {
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "version",
+        "owner",
+        "classification",
+        "description",
+        "capabilities",
+        "invariants",
+        "actions",
+        "signing"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Globally unique module identifier."
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable module name."
+        },
+        "version": {
+          "type": "string",
+          "description": "Semantic version string."
+        },
+        "owner": {
+          "type": "string",
+          "description": "Organization or individual responsible for the module."
+        },
+        "classification": {
+          "type": "string",
+          "enum": ["core", "premium", "enterprise", "community"],
+          "description": "Module classification."
+        },
+        "description": {
+          "type": "string",
+          "description": "Short description of the module."
+        },
+        "capabilities": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Capabilities provided by the module."
+        },
+        "invariants": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Named invariants enforced or required by the module."
+        },
+        "actions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Named actions the module can perform."
+        },
+        "signing": {
+          "type": "object",
+          "required": ["required", "owner"],
+          "properties": {
+            "required": {
+              "type": "boolean",
+              "description": "Whether the module must be signed."
+            },
+            "owner": {
+              "type": "string",
+              "description": "Signing authority."
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,130 @@
+{
+  "meta": {
+    "id": "finance.00007.aml_kyc.v1",
+    "version": "1.0.0",
+    "domain": "regulatory",
+    "label": "AML/KYC Governance Pack",
+    "description": "Deterministic AML/KYC workflow enforcement with evidence-grade audit trails.",
+    "eu_ai_act": ["Art. 10", "Art. 12"]
+  },
+  "io": {
+    "inputs": [
+      "customer_profile",
+      "kyc_documents",
+      "screening_results",
+      "transaction_pattern_alert"
+    ],
+    "outputs": [
+      "kyc_decision",
+      "aml_case_record",
+      "escalation_ticket"
+    ],
+    "replay_key": "customer_id"
+  },
+  "workflow": {
+    "states": [
+      "kyc_pending",
+      "kyc_in_review",
+      "kyc_approved",
+      "kyc_rejected",
+      "aml_case_open",
+      "aml_case_closed"
+    ],
+    "initial_state": "kyc_pending",
+    "terminal_states": ["kyc_approved", "kyc_rejected", "aml_case_closed"],
+    "transitions": [
+      {
+        "from": "kyc_pending",
+        "to": "kyc_in_review",
+        "on": "documents_received"
+      },
+      {
+        "from": "kyc_in_review",
+        "to": "kyc_approved",
+        "on": "kyc_passed"
+      },
+      {
+        "from": "kyc_in_review",
+        "to": "kyc_rejected",
+        "on": "kyc_failed"
+      },
+      {
+        "from": "kyc_approved",
+        "to": "aml_case_open",
+        "on": "suspicious_activity_detected"
+      },
+      {
+        "from": "aml_case_open",
+        "to": "aml_case_closed",
+        "on": "case_resolved"
+      }
+    ],
+    "guards": [
+      {
+        "name": "pep_requires_senior_review",
+        "applies_to": "kyc_in_review",
+        "expression": "if is_pep(customer_id) then senior_reviewer_assigned()"
+      }
+    ]
+  },
+  "governance": {
+    "validators": [
+      {
+        "id": "aml.kyc_doc_schema",
+        "type": "schema",
+        "target": "kyc_documents",
+        "spec_ref": "schemas/finance/kyc_documents_v1.json"
+      }
+    ],
+    "risk_checks": [
+      {
+        "id": "aml.high_risk_country",
+        "severity": "high",
+        "expression": "customer_country in high_risk_country_list()"
+      }
+    ],
+    "approvals": [
+      {
+        "id": "aml.sar_filing_approval",
+        "trigger": "suspicious_activity_detected",
+        "required_roles": ["aml_officer"]
+      }
+    ]
+  },
+  "evidence": {
+    "logs": [
+      {
+        "id": "aml.case_timeline",
+        "source": "aml_case_record",
+        "format": "timeline",
+        "indexed_by": ["customer_id", "case_id"]
+      }
+    ],
+    "artifacts": [
+      {
+        "id": "aml.kyc_package",
+        "type": "archive",
+        "content_ref": "kyc_documents",
+        "hash_algorithm": "sha256"
+      }
+    ],
+    "retention": {
+      "policy_id": "finance.aml_10y",
+      "min_years": 10
+    }
+  },
+  "integration": {
+    "event_bindings": [
+      {
+        "on_event": "customer.onboarded",
+        "handler": "start_kyc"
+      },
+      {
+        "on_event": "transaction.alert",
+        "handler": "open_aml_case_if_needed"
+      }
+    ],
+    "topics": ["aml", "kyc", "screening"],
+    "tags": ["regulatory", "high_risk"]
+  }
+}
