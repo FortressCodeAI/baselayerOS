@@ -1,0 +1,107 @@
+{
+  "ues_version": "1.0.0",
+
+  "intent": {
+    "name": "string",
+    "description": "string",
+    "domain": "string",
+    "priority": "low|normal|high"
+  },
+
+  "inputs": {
+    "raw": "string",
+    "structured": { }
+  },
+
+  "capabilities": [
+    {
+      "id": "string",
+      "name": "string",
+      "version": "string",
+      "provider": "agent|module|workflow",
+      "preconditions": [ "string" ],
+      "postconditions": [ "string" ],
+      "scopes": [ "read", "write", "execute" ]
+    }
+  ],
+
+  "plan": {
+    "phases": [
+      {
+        "id": "string",
+        "name": "string",
+        "tasks": [
+          {
+            "id": "string",
+            "description": "string",
+            "capability": "capability_id",
+            "inputs": { },
+            "outputs": { },
+            "dependencies": [ "task_id" ],
+            "preconditions": [ "string" ],
+            "postconditions": [ "string" ]
+          }
+        ]
+      }
+    ],
+    "graph": {
+      "nodes": [ "task_id" ],
+      "edges": [
+        { "from": "task_id", "to": "task_id" }
+      ]
+    }
+  },
+
+  "constraints": {
+    "hard": [ "string" ],
+    "soft": [ "string" ],
+    "max_cost_giu": 0,
+    "max_latency_ms": 0,
+    "safety_level": "standard|strict",
+    "compliance_targets": [ "string" ]
+  },
+
+  "conditions": {
+    "pre": [ "string" ],
+    "post": [ "string" ]
+  },
+
+  "scores": {
+    "cost": 0.000,
+    "risk": 0.000,
+    "time": 0.000
+  },
+
+  "state": {
+    "status": "DRAFTED|OPTIMIZED|RISK_REVIEWED|APPROVED|COMPILED|EXECUTED|REJECTED",
+    "last_transition_at": "ISO8601",
+    "last_transition_by": "string"
+  },
+
+  "authority": {
+    "subject_id": "string",
+    "roles": [ "string" ],
+    "scopes": [ "string" ],
+    "top_authority_required": false
+  },
+
+  "approvals": {
+    "requester_signature": "string|null",
+    "top_authority_signature": "string|null"
+  },
+
+  "audit": {
+    "event_chain_head": "sha256",
+    "events": [ "event_id" ],
+    "request_id": "uuid",
+    "proposal_id": "uuid",
+    "timestamp": "ISO8601",
+    "actor": {
+      "id": "string",
+      "org": "string",
+      "roles": [ "string" ]
+    },
+    "policy_versions": [ "string" ],
+    "capability_versions": [ "string" ]
+  }
+}
