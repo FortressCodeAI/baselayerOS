@@ -1,0 +1,24 @@
+# baselayeros/config/base.yaml
+
+environment: base
+
+engine:
+  log_level: INFO
+  audit_enabled: true
+  authority_gate:
+    max_autonomous_risk_tier: 3   # Regulus allowed 0–3
+    escalate_on_refusal: true
+
+regulus:
+  risk_mode: strict
+  max_autonomous_risk_tier: 3
+  templates:
+    - low_risk
+    - sensitive_operation
+    - financial_operation
+
+company:
+  compliance:
+    enabled: true
+    notify_customer: true
+    store_audit_event: true

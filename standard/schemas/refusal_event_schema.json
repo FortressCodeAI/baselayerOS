@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "RefusalEvent",
+  "type": "object",
+  "properties": {
+    "event_type": { "type": "string", "enum": ["refusal"] },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "node_id": { "type": "string" },
+    "operator_contract_clause": { "type": "string" },
+    "violated_constraint": { "type": "string" },
+    "input_hash": { "type": "string" },
+    "refusal_reason": { "type": "string" },
+    "giu_burn": { "type": "number" }
+  },
+  "required": [
+    "event_type",
+    "timestamp",
+    "node_id",
+    "operator_contract_clause",
+    "violated_constraint",
+    "input_hash",
+    "refusal_reason",
+    "giu_burn"
+  ],
+  "additionalProperties": false
+}

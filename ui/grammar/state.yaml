@@ -1,0 +1,26 @@
+type: grammar
+target: state
+description: Defines the internal structure of a flow state.
+
+structure:
+  order:
+    - id
+    - title
+    - children
+
+children:
+  allowed:
+    - panel
+    - section
+    - field
+    - list
+    - action
+    - summary
+    - transition
+    - condition
+    - guard
+
+rules:
+  - "state id must be unique within the flow"
+  - "state must contain at least one child"
+  - "state cannot contain another state"

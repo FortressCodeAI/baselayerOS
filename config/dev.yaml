@@ -1,0 +1,24 @@
+# baselayeros/config/dev.yaml
+
+environment: dev
+
+extends: base.yaml
+
+engine:
+  log_level: DEBUG
+  audit_enabled: true
+
+smtp:
+  host: localhost
+  port: 1025
+  use_tls: false
+  demo_mode: true
+
+regulus:
+  risk_mode: strict
+  max_autonomous_risk_tier: 3
+
+company:
+  compliance:
+    notify_customer: true
+    demo_documents: true

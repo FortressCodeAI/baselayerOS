@@ -1,0 +1,19 @@
+type: grammar
+target: flow
+description: Defines the structure and behavior of deterministic multi-state flows.
+
+structure:
+  order:
+    - id
+    - initial_state
+    - children
+
+children:
+  allowed:
+    - state
+
+rules:
+  - "flow must define a unique id"
+  - "flow must define an initial_state"
+  - "initial_state must match one of the defined states"
+  - "flow cannot contain panels directly"

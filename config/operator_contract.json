@@ -1,0 +1,41 @@
+{
+  "version": "1.0.0",
+  "operator_contract": {
+    "description": "BaseLayerOS Operator Contract defining allowed and forbidden actions for automated and human operators.",
+    "rules": [
+      {
+        "id": "risk-tier-autonomy",
+        "description": "Regulus may autonomously execute operations only when risk tier < 4.",
+        "actor": "regulus",
+        "condition": "risk_tier < 4",
+        "action": "allow"
+      },
+      {
+        "id": "risk-tier-escalation",
+        "description": "Operations with risk tier >= 4 require human approval.",
+        "actor": "regulus",
+        "condition": "risk_tier >= 4",
+        "action": "escalate"
+      },
+      {
+        "id": "human-override",
+        "description": "Human operators may override Regulus decisions when escalation is required.",
+        "actor": "human",
+        "condition": "risk_tier >= 4",
+        "action": "allow"
+      },
+      {
+        "id": "forbid-unsafe-operations",
+        "description": "No operator may execute operations marked as unsafe.",
+        "actor": "any",
+        "condition": "operation in forbidden_operations",
+        "action": "deny"
+      }
+    ],
+    "forbidden_operations": [
+      "delete_audit_chain",
+      "disable_authority_gate",
+      "disable_risk_assessment"
+    ]
+  }
+}

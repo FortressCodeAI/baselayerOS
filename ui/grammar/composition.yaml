@@ -1,0 +1,23 @@
+type: grammar
+target: composition
+description: Defines allowed nesting and composition rules for all primitives.
+
+nesting:
+  panel:
+    allows: [section, field, list, action, metric, chart, summary]
+  section:
+    allows: [field, list, action, metric, chart]
+  list:
+    allows: [item]
+  item:
+    allows: [field, badge, action, metric]
+  summary:
+    allows: [field, metric, badge]
+  frame:
+    allows: [panel, section, field, list, action, metric, chart]
+
+rules:
+  - "frames cannot contain other frames"
+  - "items cannot contain items"
+  - "lists must contain at least one item definition"
+  - "panels must contain at least one child"

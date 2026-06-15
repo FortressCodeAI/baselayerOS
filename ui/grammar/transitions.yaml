@@ -1,0 +1,16 @@
+type: grammar
+target: transition
+description: Defines how transitions operate within flows.
+
+structure:
+  order:
+    - on
+    - to
+    - guard
+
+rules:
+  - "transition must define an event via 'on'"
+  - "transition must define a target state via 'to'"
+  - "target state must exist within the same flow"
+  - "guard expression must evaluate to boolean if provided"
+  - "transition cannot contain children"

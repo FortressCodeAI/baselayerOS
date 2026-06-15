@@ -1,29 +1,49 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "baselayeros"
 version = "0.1.0"
-description = "Deterministic AI substrate with GIU-governed execution"
+description = "BaseLayerOS — a deterministic execution substrate for AI governance built on the Universal Execution Schema (UES)."
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 license = { text = "MIT" }
-
 authors = [
   { name = "James Archer-Lewis" }
 ]
+keywords = ["ai", "governance", "deterministic", "orchestration", "substrate"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+]
 
 dependencies = [
-    "fastapi>=0.115.0",
-    "uvicorn[standard]>=0.30.0",
-    "pydantic>=2.7.0",
-    "pydantic-settings>=2.2.1",
-    "click>=8.1.0"
+  "jsonschema>=4.21.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0.0",
+  "pytest-cov>=4.1.0",
+  "mypy>=1.8.0",
+  "ruff>=0.3.0",
+  "pre-commit>=3.6.0",
 ]
 
 [project.scripts]
-baselayeros = "baselayeros.cli:main"
-
-[tool.setuptools]
-package-dir = {"" = "src"}
+baselayeros = "cli.main:main"
 
 [tool.setuptools.packages.find]
-where = ["src"]
-include = ["baselayeros*"]
+where = ["."]
+include = ["src*", "cli*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+addopts = "-q"

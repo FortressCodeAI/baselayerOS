@@ -1,0 +1,23 @@
+type: grammar
+target: logic
+description: Defines evaluation rules for conditions and guards.
+
+condition:
+  must:
+    - "evaluate to boolean"
+    - "contain at least one child"
+  allowed_children:
+    - field
+    - badge
+    - action
+    - transition
+
+guard:
+  must:
+    - "evaluate to boolean"
+  allowed_children: []
+
+rules:
+  - "conditions may wrap UI elements"
+  - "guards may only appear on transitions or actions"
+  - "logic expressions must not mutate state"

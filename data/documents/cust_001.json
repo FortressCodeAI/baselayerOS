@@ -1,0 +1,8 @@
+[
+  {
+    "id": "doc_001",
+    "customer_id": "cust_001",
+    "type": "Business License",
+    "expiry_date": "2026-12-31T00:00:00"
+  }
+]

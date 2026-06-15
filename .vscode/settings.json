@@ -4,6 +4,12 @@
             "path": ".",
             "envManager": "ms-python.python:system",
             "packageManager": "ms-python.python:pip"
+        {
+  "python.analysis.extraPaths": [
+    "./baselayeros"
+  ],
+  "python.analysis.autoImportCompletions": true
+}
         }
     ]
 }

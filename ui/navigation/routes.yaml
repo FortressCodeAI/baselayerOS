@@ -1,0 +1,20 @@
+routes:
+  dashboard:
+    type: screen
+    file: screens/dashboard.regulus
+
+  search.cases:
+    type: screen
+    file: screens/search_cases.regulus
+
+  grievances.review:
+    type: flow
+    file: flows/grievance_review.flow
+
+  grievances.list:
+    type: screen
+    file: screens/grievance_list.regulus
+
+  grievances.new:
+    type: screen
+    file: screens/grievance_new.regulus

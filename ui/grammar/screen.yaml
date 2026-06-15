@@ -1,0 +1,20 @@
+type: grammar
+target: screen
+description: Defines the structure and allowed composition of top-level screens.
+
+structure:
+  order:
+    - id
+    - title
+    - style
+    - children
+
+children:
+  allowed:
+    - panel
+    - flow
+
+rules:
+  - "screen must define a unique id"
+  - "screen must contain at least one panel or flow"
+  - "style defaults to fortress if not provided"

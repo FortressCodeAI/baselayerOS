@@ -1,0 +1,9 @@
+type: grammar
+target: binding
+description: Defines how UI elements bind to substrate data.
+
+rules:
+  - "bind.path must reference a valid substrate field"
+  - "bind.transform, if present, must be a valid expression"
+  - "binding is only allowed on: field, longtext, taglist, metric, chart, badge, list, diagnostic"
+  - "binding cannot appear on structural primitives"

@@ -1,0 +1,25 @@
+# baselayeros/config/prod.yaml
+
+environment: prod
+
+extends: base.yaml
+
+engine:
+  log_level: INFO
+  audit_enabled: true
+
+smtp:
+  host: smtp.sendgrid.net
+  port: 587
+  use_tls: true
+  username: ${SMTP_USERNAME}
+  password: ${SMTP_PASSWORD}
+
+regulus:
+  risk_mode: strict
+  max_autonomous_risk_tier: 3
+
+company:
+  compliance:
+    notify_customer: true
+    demo_documents: false

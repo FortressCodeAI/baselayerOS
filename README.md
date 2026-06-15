@@ -1,59 +1,66 @@
-# BaseLayerOS Public Standard
+# BaseLayerOS
 
-BaseLayerOS is the open deterministic AI governance standard.  
-It defines the schemas, specifications, and interfaces required to build
-deterministic, replayable, auditable, and compliance‑enforced AI systems.
+BaseLayerOS is a **deterministic execution substrate** for AI systems, built around a single canonical contract:
 
-This repository contains:
+- `**UES - Universal Execution Schema**`
 
-- The **Deterministic Runtime Specification**
-- The **Replay Trace Format**
-- The **Audit Log Format**
-- The **Module Manifest Specification**
-- The **Compliance Pack Interface**
-- The **Workflow Specification**
-- The **Python SDK** for building modules and workflows
-- Reference examples for integrators and researchers
+Every task, workflow or "proposal" is represented as a UES object, passed through a strict lifecycle:
 
-This repository does *not* contain:
+`DRAFTED -> OPTIMIZED -> RISK_REVIEWED -> APPROVED -> COMPILED -> EXECUTED (or REJECTED)`
 
-- The deterministic runtime engine  
-- The compliance enforcement engine  
-- The provenance engine  
-- The lifecycle governance engine  
-- Premium or enterprise modules  
-- Marketplace or revenue systems  
+No backdoors. No implicit behaviour. Everything is explicit, auditable and replayable.
 
-Those live in the private enterprise repository.
+## Core Ideas
 
-## Why BaseLayerOS?
+- **Universal Execution Schema (UES)**
+    A versioned, immutable schema that describes:
+- intent
+- inputs
+- capabilities
+- plan (phases, tasks, graph)
+- constraints
+- global conditions (pre/post)
+- scores
+- state
+- authority & approvals
+- audit chain
 
-Modern AI systems are probabilistic.  
-Enterprises and regulators require determinism, auditability, and governance.
+- **Deterministic substrate**
+    The runtime never "guesses". It:
 
-BaseLayerOS provides:
+- validates UES against a frozen schema
+- enforces a strict state machine
+- fails closed on ambiguity or invalidity
 
-- Deterministic execution rules  
-- Cryptographically anchored audit logs  
-- Replayable decision traces  
-- Compliance‑enforced workflows  
-- A standard module contract  
-- A shared governance vocabulary  
+- **Councils, compiler, executor**
+- Council 1: structure & plan validation
+- Council 2: risk, cost, time, safety, compliance
+- Compiler: deterministic codegen with pre/post enforcement
+- Executor: runs compiled artifacts and validates postconditions
 
-This standard enables integrators, enterprises, and researchers to build
-trustworthy AI systems that satisfy regulatory requirements across finance,
-healthcare, insurance, employment, and other high‑risk domains.
+- **Audit chain**
+    Every transition appends an events to a SHA-256 chain for tamper detection and replay.
 
-## Repository Structure
+## Quick Start
 
-docs/           # Human-readable specifications
-standard/       # Machine-readable schemas and examples
-sdk/            # Python SDK for building modules and workflows
+`Bash
 
-## Getting Started
+### install in editable mode
 
-See **docs/overview.md** for a complete introduction.
+`pip install -e ".[dev]"
+
+### run tests
+
+pytest
+
+### run a sample UES through the pipeline
+
+python examples/minimal/run.py
+
+## Status
+
+This is an early but opinionated implementation of a deterministic substrate intended for serious AI governance and enterprise integration. The UES v1.0.0 schema is frozen; future changes will be additive and versioned.
 
 ## License
 
-This repository is licensed under the Apache 2.0 License.
+MIT
