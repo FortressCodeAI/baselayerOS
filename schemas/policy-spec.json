@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PolicySpec",
+  "description": "Deterministic policy specification for governed execution.",
+  "type": "object",
+
+  "properties": {
+    "policy_id": { "type": "string" },
+    "description": { "type": "string" },
+
+    "identity_rules": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+
+    "tool_rules": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+
+    "data_rules": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+
+    "model_rules": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+
+    "cross_cloud_rules": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+
+  "required": [
+    "policy_id",
+    "description",
+    "identity_rules",
+    "tool_rules",
+    "data_rules",
+    "model_rules",
+    "cross_cloud_rules"
+  ]
+}

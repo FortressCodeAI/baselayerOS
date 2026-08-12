@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SubstrateExecutionArtifact",
+  "description": "SEA artifact containing deterministic execution traces, envelope lineage, invariant verification, and replay metadata.",
+  "type": "object",
+
+  "properties": {
+    "artifact_id": { "type": "string" },
+    "envelope_lineage": {
+      "type": "array",
+      "description": "Ordered list of envelopes executed deterministically.",
+      "items": { "type": "string" }
+    },
+
+    "invariant_verification": {
+      "type": "object",
+      "description": "Invariant verification results for each transition."
+    },
+
+    "replay_metadata": {
+      "type": "object",
+      "description": "Replay instructions for deterministic re‑execution."
+    },
+
+    "audit_trace": {
+      "type": "object",
+      "description": "Audit trace bundle for hyperscaler governance systems."
+    }
+  },
+
+  "required": [
+    "artifact_id",
+    "envelope_lineage",
+    "invariant_verification",
+    "replay_metadata",
+    "audit_trace"
+  ]
+}

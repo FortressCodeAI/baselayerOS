@@ -1,0 +1,65 @@
+name: Security Scans
+
+on:
+  schedule:
+    - cron: '0 3 * * 1'
+  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  codeql:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: rust
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v2
+
+      - name: Run CodeQL analysis
+        uses: github/codeql-action/analyze@v2
+
+  cargo-audit:
+    runs-on: ubuntu-latest
+    needs: codeql
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      
+
+      - name: Install cargo-audit
+        run: cargo install cargo-audit --version 0.17.0
+
+      - name: Run cargo-audit
+        run: |
+          cargo audit --json > audit-report.json || true
+          cat audit-report.json
+
+      - name: Upload audit report
+        uses: actions/upload-artifact@v4
+        with:
+          name: cargo-audit-report
+          path: audit-report.json
+
+  ssca-signature-check:
+    runs-on: ubuntu-latest
+    needs: cargo-audit
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify SBOM or signatures if present
+        run: |
+          echo "Optional SBOM/signature checks can be added here."

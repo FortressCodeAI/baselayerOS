@@ -1,0 +1,106 @@
+name: CI Build Test and Optional Sign
+
+on:
+  push:
+    branches: [ "main" ]
+    tags: [ 'v*' ]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    env:
+      RUSTUP_TOOLCHAIN: stable
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+            toolchain: stable
+            profile: minimal
+            override: true
+
+      - name: Cache cargo registry and target
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
+      - name: Build
+        run: cargo build --all --verbose
+
+      - name: Run tests
+        run: cargo test --all --verbose
+
+      - name: Run clippy (warnings as errors)
+        run: cargo clippy --all-targets --all-features -- -D warnings
+
+      - name: Run fmt check
+        run: cargo fmt --all -- --check
+
+      - name: Optional demo run (only on manual or tag)
+        if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/')
+        run: |
+          cargo run --release -- --workflow || true
+
+  sign-artifacts:
+    needs: build-test
+    runs-on: ubuntu-latest
+    # Run on tags only; do not reference secrets in the job-level if
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+            toolchain: stable
+            profile: minimal
+            override: true
+
+      - name: Ensure AUDIT_PRIVATE_KEY_B64 is present
+        run: |
+          if [ -z "${AUDIT_PRIVATE_KEY_B64}" ]; then
+            echo "AUDIT_PRIVATE_KEY_B64 secret is not set. Failing the job."
+            exit 1
+          fi
+        env:
+          AUDIT_PRIVATE_KEY_B64: ${{ secrets.AUDIT_PRIVATE_KEY_B64 }}
+
+      - name: Decode private key
+        run: |
+          mkdir -p .keys
+          echo "${AUDIT_PRIVATE_KEY_B64}" | base64 --decode > .keys/private_key.ed25519
+          chmod 600 .keys/private_key.ed25519
+        env:
+          AUDIT_PRIVATE_KEY_B64: ${{ secrets.AUDIT_PRIVATE_KEY_B64 }}
+
+      - name: Build audit_chain
+        run: cargo build --bin audit_chain --release
+
+      - name: Sign audit artifacts
+        run: |
+          mkdir -p artifacts
+          ./target/release/audit_chain sign --audit-dir ./audit --out ./artifacts/audit-chain.jsonl --key .keys/private_key.ed25519
+
+      - name: Upload signed chain artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: audit-chain
+          path: artifacts/audit-chain.jsonl

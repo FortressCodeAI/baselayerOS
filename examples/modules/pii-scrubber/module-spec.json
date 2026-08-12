@@ -1,0 +1,23 @@
+{
+  "module_name": "pii-scrubber",
+  "description": "Deterministically remove PII from free text.",
+  "invariants": [
+    "no email addresses in scrubbed_text",
+    "no phone numbers in scrubbed_text"
+  ],
+  "governance": {
+    "scopes": ["compliance"],
+    "permissions": ["scrub:pii"]
+  },
+  "interfaces": {
+    "scrub_text": {
+      "inputs": ["raw_text"],
+      "outputs": ["scrubbed_text"]
+    }
+  },
+  "replay": {
+    "paths": [
+      "scrub_text(raw_text) -> scrubbed_text"
+    ]
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "GovernanceEnvelope",
+  "description": "Governance envelope defining identity, roles, scopes, permissions, and governed execution boundaries.",
+  "type": "object",
+
+  "properties": {
+    "identity": {
+      "type": "object",
+      "description": "Identity and role context for governed execution."
+    },
+
+    "scopes": {
+      "type": "array",
+      "description": "Scopes applied to this envelope.",
+      "items": { "type": "string" }
+    },
+
+    "permissions": {
+      "type": "array",
+      "description": "Governed permissions enforced during execution.",
+      "items": { "type": "string" }
+    },
+
+    "tool_access": {
+      "type": "object",
+      "description": "Governed tool invocation constraints."
+    },
+
+    "data_access": {
+      "type": "object",
+      "description": "Governed data access constraints."
+    },
+
+    "model_invocation": {
+      "type": "object",
+      "description": "Governed model invocation rules."
+    },
+
+    "audit": {
+      "type": "object",
+      "description": "Audit trace metadata for hyperscaler governance systems."
+    }
+  },
+
+  "required": [
+    "identity",
+    "scopes",
+    "permissions",
+    "tool_access",
+    "data_access",
+    "model_invocation",
+    "audit"
+  ]
+}

@@ -1,0 +1,68 @@
+# Rust/Cargo
+/target/
+**/target/
+**/*.rs.bk
+**/*.rlib
+Cargo.lock
+
+# Build artifacts
+/*.exe
+/*.dll
+/*.so
+/*.dylib
+
+# Audit artifacts and keys (sensitive or generated)
+/audit/
+/artifacts/
+/audit-chain.jsonl
+/.keys/
+/*.ed25519
+chain-public-key.pem
+
+# Editor and OS files
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store
+Thumbs.db
+
+# Environment and secret files
+.env
+.env.local
+.env.*.local
+secrets.toml
+*.pem
+*.key
+
+# Logs and temporary files
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# CI caches and local tool state
+/.cargo/
+/.cargo/
+/rustup-toolchain
+rust-toolchain.toml
+
+# Generated files
+*.lock
+*.cache
+*.bak
+
+# Optional: ignore node modules if present
+node_modules/
+
+# Ignore coverage and test output
+coverage/
+*.lcov
+
+# Ignore IDE project files
+*.iml
+*.ipr
+*.iws
+
+# Ignore OS-specific metadata
+Desktop.ini
