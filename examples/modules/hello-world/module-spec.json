@@ -1,0 +1,22 @@
+{
+  "module_name": "hello-world",
+  "description": "Deterministic greeting module.",
+  "invariants": [
+    "outputs.message MUST be non-empty"
+  ],
+  "governance": {
+    "scopes": ["demo"],
+    "permissions": ["emit:greeting"]
+  },
+  "interfaces": {
+    "emit_greeting": {
+      "inputs": ["name"],
+      "outputs": ["message"]
+    }
+  },
+  "replay": {
+    "paths": [
+      "emit_greeting(name) -> message"
+    ]
+  }
+}

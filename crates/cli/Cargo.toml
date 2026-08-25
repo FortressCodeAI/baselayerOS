@@ -1,0 +1,23 @@
+[package]
+name = "baselayeros-cli"
+version = "1.0.0"
+edition = "2021"
+description = "Deterministic governance CLI for BaseLayerOS substrate execution."
+license = "MIT"
+
+[[bin]]
+name = "baselayer"
+path = "src/main.rs"
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+clap = { version = "4.0", features = ["derive"] }
+anyhow = "1.0"
+uuid = { version = "1.3", features = ["v4"] }
+
+kernel = { path = "../kernel" }
+substrate = { path = "../substrate" }
+envelopes = { path = "../envelopes" }
+adapters = { path = "../adapters" }
+

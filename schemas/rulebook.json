@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "KernelRulebook",
+  "description": "Deterministic kernel rulebook defining substrate execution laws.",
+  "type": "object",
+
+  "properties": {
+    "execution_rules": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+
+    "invariant_rules": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+
+    "envelope_rules": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+
+    "governance_rules": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+
+    "replay_rules": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+
+    "refusal_path_rules": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+
+  "required": [
+    "execution_rules",
+    "invariant_rules",
+    "envelope_rules",
+    "governance_rules",
+    "replay_rules",
+    "refusal_path_rules"
+  ]
+}

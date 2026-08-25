@@ -1,0 +1,34 @@
+# Ignore private crates
+crates/kernel/
+crates/substrate/
+crates/proofs/
+crates/adapters/
+crates/envelopes/
+
+# Ignore private physics
+physics/
+private/
+internal/
+enterprise/
+compliance-private/
+datasets/
+configs-private/
+wasm-private/
+rust-private/
+invariants-private/
+rulebooks-private/
+
+# Ignore build artifacts
+target/
+out/
+dist/
+.next/
+node_modules/
+
+# Ignore UI build artifacts
+ui/dist/
+ui/node_modules/
+
+# Ignore web build artifacts
+web/out/
+web/node_modules/

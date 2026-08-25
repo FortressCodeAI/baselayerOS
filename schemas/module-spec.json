@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ModuleSpec",
+  "description": "Deterministic module specification for BaseLayerOS substrate components.",
+  "type": "object",
+
+  "properties": {
+    "module_name": { "type": "string" },
+    "description": { "type": "string" },
+
+    "invariants": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+
+    "governance": {
+      "type": "object",
+      "description": "Governance constraints applied to this module."
+    },
+
+    "interfaces": {
+      "type": "object",
+      "description": "Deterministic interfaces exposed by the module."
+    },
+
+    "replay": {
+      "type": "object",
+      "description": "Replay paths for deterministic execution."
+    }
+  },
+
+  "required": [
+    "module_name",
+    "description",
+    "invariants",
+    "governance",
+    "interfaces",
+    "replay"
+  ]
+}

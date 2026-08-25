@@ -1,0 +1,82 @@
+name: Audit Chain Sign and Upload
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  sign-and-upload:
+    runs-on: ubuntu-latest
+    env:
+      RUSTUP_TOOLCHAIN: stable
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          override: true
+
+      - name: Show audit directory (debug)
+        run: |
+          echo "Listing audit directory"
+          ls -la audit || true
+
+      - name: Decode private key from secret
+        id: decode_key
+        run: |
+          if [ -z "${AUDIT_PRIVATE_KEY_B64}" ]; then
+            echo "Missing AUDIT_PRIVATE_KEY_B64 secret" >&2
+            exit 1
+          fi
+          mkdir -p .keys
+          echo "$AUDIT_PRIVATE_KEY_B64" | base64 --decode > .keys/private_key.ed25519
+          chmod 600 .keys/private_key.ed25519
+        env:
+          AUDIT_PRIVATE_KEY_B64: ${{ secrets.AUDIT_PRIVATE_KEY_B64 }}
+
+      - name: Build audit_chain tool
+        run: cargo build --bin audit_chain --release
+
+      - name: Run audit_chain sign
+        id: sign_chain
+        run: |
+          mkdir -p artifacts
+          ./target/release/audit_chain sign \
+            --audit-dir ./audit \
+            --out ./artifacts/audit-chain.jsonl \
+            --key .keys/private_key.ed25519
+
+      - name: Configure AWS credentials
+        if: success()
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Upload chain to S3
+        if: success()
+        run: |
+          aws s3 cp artifacts/audit-chain.jsonl s3://${{ secrets.S3_AUDIT_BUCKET }}/audit-chain-${GITHUB_REF_NAME:-${GITHUB_RUN_ID}}.jsonl --acl bucket-owner-full-control
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+
+      - name: Upload chain as GitHub artifact (fallback)
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: audit-chain
+          path: artifacts/audit-chain.jsonl

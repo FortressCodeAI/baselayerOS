@@ -1,0 +1,26 @@
+{
+  "package": {
+    "productName": "BaseLayerOS",
+    "version": "0.1.0"
+  },
+  "tauri": {
+    "windows": [
+      {
+        "title": "BaseLayerOS",
+        "width": 1280,
+        "height": 800,
+        "resizable": true
+      }
+    ],
+    "allowlist": {
+      "shell": { "all": true },
+      "fs": { "all": true },
+      "path": { "all": true }
+    },
+    "bundle": {
+      "active": true,
+      "identifier": "com.baselayeros.app",
+      "targets": ["msi", "nsis"]
+    }
+  }
+}

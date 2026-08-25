@@ -1,0 +1,20 @@
+{
+  "policy_id": "pii-scrub-policy-001",
+  "description": "Scrub PII from input text before downstream processing.",
+  "identity_rules": [
+    "caller MUST be in role 'data-processor'"
+  ],
+  "tool_rules": [
+    "ONLY module 'pii-scrubber' MAY be invoked for PII removal"
+  ],
+  "data_rules": [
+    "raw_text MUST NOT be logged",
+    "scrubbed_text MAY be logged"
+  ],
+  "model_rules": [
+    "LLM MUST only see scrubbed_text"
+  ],
+  "cross_cloud_rules": [
+    "PII MUST NOT leave region 'ca-central-1'"
+  ]
+}

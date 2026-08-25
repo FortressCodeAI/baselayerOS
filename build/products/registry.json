@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "wasm": {
+    "modules": [
+      {
+        "id": "core",
+        "crate": "crates/wasm-core",
+        "output": "dist/wasm/core.wasm"
+      }
+    ]
+  },
+  "rust": {
+    "crates": [
+      {
+        "id": "kernel",
+        "path": "crates/kernel",
+        "output": "dist/rust/kernel"
+      },
+      {
+        "id": "substrate",
+        "path": "crates/substrate",
+        "output": "dist/rust/substrate"
+      },
+      {
+        "id": "envelopes",
+        "path": "crates/envelopes",
+        "output": "dist/rust/envelopes"
+      },
+      {
+        "id": "adapters",
+        "path": "crates/adapters",
+        "output": "dist/rust/adapters"
+      },
+      {
+        "id": "cli",
+        "path": "crates/cli",
+        "output": "dist/rust/cli"
+      }
+    ]
+  },
+  "ui": {
+    "apps": [
+      {
+        "id": "web",
+        "path": "ui",
+        "output": "dist/ui/web"
+      },
+      {
+        "id": "tauri",
+        "path": "ui",
+        "output": "dist/ui/tauri"
+      }
+    ]
+  },
+  "artifacts": {
+    "bundles": [
+      {
+        "id": "release-bundle",
+        "output": "dist/artifacts/release"
+      }
+    ]
+  }
+}

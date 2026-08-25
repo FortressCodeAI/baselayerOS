@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ExecutionEnvelope",
+  "description": "Deterministic execution envelope defining governed transitions, invariants, replay paths, and trace anchors.",
+  "type": "object",
+
+  "properties": {
+    "envelope_id": {
+      "type": "string",
+      "description": "Unique deterministic envelope identifier."
+    },
+
+    "state_snapshot": {
+      "type": "object",
+      "description": "Deterministic snapshot of substrate state before transition."
+    },
+
+    "transition": {
+      "type": "object",
+      "description": "Deterministic transition definition.",
+      "properties": {
+        "name": { "type": "string" },
+        "inputs": { "type": "object" },
+        "outputs": { "type": "object" }
+      }
+    },
+
+    "invariants": {
+      "type": "array",
+      "description": "Invariant set enforced before and after transition.",
+      "items": { "type": "string" }
+    },
+
+    "governance_boundary": {
+      "type": "object",
+      "description": "Governance constraints applied to this envelope."
+    },
+
+    "replay_path": {
+      "type": "array",
+      "description": "Deterministic replay steps for inference-free execution.",
+      "items": { "type": "string" }
+    },
+
+    "trace_anchor": {
+      "type": "object",
+      "description": "Audit-ready trace anchor for hyperscaler governance systems."
+    }
+  },
+
+  "required": [
+    "envelope_id",
+    "state_snapshot",
+    "transition",
+    "invariants",
+    "governance_boundary",
+    "replay_path",
+    "trace_anchor"
+  ]
+}

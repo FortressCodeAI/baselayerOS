@@ -1,0 +1,16 @@
+[workspace]
+members = [
+    "crates/kernel",
+    "crates/substrate",
+    "crates/envelopes",
+    "crates/adapters",
+    "crates/cli",
+    "crates/wasm-core",
+    "tauri/src-tauri"
+]
+
+resolver = "2"
+
+[workspace.package]
+edition = "2021"
+license = "MIT"

@@ -1,0 +1,23 @@
+{
+  "module_name": "data-cleaner",
+  "description": "Normalize and sanitize structured data deterministically.",
+  "invariants": [
+    "no null keys",
+    "no unexpected fields"
+  ],
+  "governance": {
+    "scopes": ["etl"],
+    "permissions": ["clean:data"]
+  },
+  "interfaces": {
+    "clean_record": {
+      "inputs": ["record"],
+      "outputs": ["clean_record"]
+    }
+  },
+  "replay": {
+    "paths": [
+      "clean_record(record) -> clean_record"
+    ]
+  }
+}

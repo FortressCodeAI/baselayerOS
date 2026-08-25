@@ -1,0 +1,17 @@
+{
+  "name": "baselayeros",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:all": "node build/cli.js all",
+    "build:verify": "node build/cli.js verify",
+    "build:ui": "npm --prefix ui run build",
+    "build:tauri": "npm --prefix ui run tauri build",
+    "build:wasm": "node build/cli.js wasm",
+    "build:rust": "cargo build --workspace --release"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  }
+}

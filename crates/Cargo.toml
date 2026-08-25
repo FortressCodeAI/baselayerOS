@@ -1,0 +1,12 @@
+[workspace]
+members = [
+    "wasm-core",
+    "substrate",
+    "kernel",
+    "proofs",
+    "envelopes",
+    "cli",
+    "adapters"
+    , "kali", "modules", "verification"]
+
+resolver = "2"

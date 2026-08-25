@@ -1,0 +1,33 @@
+{
+  "envelope_id": "exec-hello-world-001",
+  "state_snapshot": {
+    "module": "hello-world",
+    "version": "0.1.0"
+  },
+  "transition": {
+    "name": "emit_greeting",
+    "inputs": {
+      "name": "James"
+    },
+    "outputs": {
+      "message": "Hello, James"
+    }
+  },
+  "invariants": [
+    "outputs.message MUST be non-empty",
+    "module MUST be 'hello-world'"
+  ],
+  "governance_boundary": {
+    "identity": "system",
+    "scopes": ["demo"],
+    "permissions": ["emit:greeting"]
+  },
+  "replay_path": [
+    "load_module:hello-world",
+    "apply_transition:emit_greeting"
+  ],
+  "trace_anchor": {
+    "timestamp": "2026-08-10T09:30:00Z",
+    "request_id": "req-1234"
+  }
+}
