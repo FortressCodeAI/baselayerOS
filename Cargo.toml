@@ -11,6 +11,10 @@ members = [
 
 resolver = "2"
 
+[[bin]]
+name = "baselayeros"
+path = "src/main.rs"
+
 [workspace.package]
 edition = "2021"
 license = "MIT"
