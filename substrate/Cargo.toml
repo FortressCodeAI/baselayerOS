@@ -1,0 +1,45 @@
+[package]
+name = "baselayeros-substrate"
+version = "2.0.0"
+edition = "2021"
+license = "MIT"
+authors = ["James Archer-Lewis"]
+
+[dependencies]
+# Serialization + formats
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+serde_yaml = "0.9"
+toml = "0.8"
+
+# Errors
+anyhow = "1.0"
+thiserror = "1.0"
+
+# Time + IDs
+chrono = { version = "0.4", features = ["serde"] }
+uuid = { version = "1.6", features = ["serde", "v4"] }
+
+# Hashing + encoding
+sha2 = "0.10"
+hex = "0.4"
+base64 = "0.21"
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["fmt", "env-filter"] }
+
+# Concurrency + utilities
+parking_lot = "0.12"
+rand = "0.8"
+
+# HTTP client (for Supabase audit chain)
+reqwest = { version = "0.11", features = ["json", "blocking"] }
+
+common = { path = "../common" }
+envelopes = { path = "../envelopes" }
+audit = { path = "../audit" }
+
+
+[dev-dependencies]
+serde_json = "1.0"

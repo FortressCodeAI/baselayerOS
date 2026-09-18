@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://baselayeros.ca/schemas/kali-envelope.json",
+  "title": "Kali Envelope Standard v1.0",
+  "description": "Canonical envelope format required by BaseLayerOS deterministic substrate.",
+  "type": "object",
+  "required": [
+    "id",
+    "kind",
+    "source",
+    "timestamp",
+    "payload",
+    "tags"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Stable identifier for the envelope. Usually a hash or UUID."
+    },
+    "kind": {
+      "type": "string",
+      "enum": ["Intent", "Governance", "Evidence", "Control"],
+      "description": "High-level envelope category."
+    },
+    "source": {
+      "type": "string",
+      "minLength": 1,
+      "description": "AI system, agent, or governance engine that produced this envelope."
+    },
+    "correlation_id": {
+      "type": "string",
+      "description": "Optional workflow/session/incident correlation identifier."
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO-8601 timestamp when the envelope was produced."
+    },
+    "payload": {
+      "type": "object",
+      "description": "Structured JSON payload. Keys must be deterministic and meaningful."
+    },
+    "tags": {
+      "type": "object",
+      "description": "Routing and governance metadata.",
+      "additionalProperties": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": false
+}

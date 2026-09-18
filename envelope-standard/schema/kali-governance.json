@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://baselayeros.ca/schemas/kali-governance.json",
+  "title": "Kali Governance Metadata v1.0",
+  "description": "Governance metadata required for deterministic evaluation by governance engines.",
+  "type": "object",
+  "required": [
+    "governance_version",
+    "engine",
+    "role",
+    "capabilities",
+    "decision"
+  ],
+  "properties": {
+    "governance_version": {
+      "type": "string",
+      "description": "Version of the governance pack or engine used."
+    },
+    "engine": {
+      "type": "string",
+      "description": "Governance engine identifier (e.g., kali, cage, rego, lula)."
+    },
+    "role": {
+      "type": "string",
+      "description": "Role performing governance evaluation (e.g., reviewer, approver, auditor)."
+    },
+    "capabilities": {
+      "type": "array",
+      "description": "Capabilities required or exercised by this governance decision.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "decision": {
+      "type": "string",
+      "enum": ["allow", "deny", "escalate", "require-change"],
+      "description": "Deterministic governance decision outcome."
+    },
+    "reason": {
+      "type": "string",
+      "description": "Optional human-readable justification for the governance decision."
+    },
+    "evidence": {
+      "type": "object",
+      "description": "Optional structured evidence used in governance evaluation.",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}

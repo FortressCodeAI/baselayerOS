@@ -23,24 +23,21 @@ This substrate aligns directly with hyperscaler governance systems such as Googl
 ## Core Guarantees
 
 - Deterministic execution
-- Zero stochastic branching  
-- Replayable inference  
-- Cross‑cloud consistency  
-- Governance‑driven compute reduction  
-- Audit‑ready traceability  
-- Regulator‑grade determinism  
+- Zero stochastic branching
+- Replayable inference
+- Cross‑cloud consistency
+- Audit‑ready traceability
+- Regulator‑grade determinism
 
 ## Architecture Overview
 
 BaseLayerOS consists of:
 
-- Deterministic Kernel  
-- Substrate State Machine  
-- Governed Data & Tool Access Layer (GDTAL)  
-- Cross‑Cloud Governance Fabric  
-- Deterministic Envelope Engine  
-- Invariant Enforcement Model  
-- Replay Engine  
+- Deterministic Kernel
+- Substrate State Machine
+- Deterministic Envelope Engine
+- Invariant Enforcement Model
+- Replay Engine
 
 Each component is designed to integrate with hyperscaler governance boundaries.
 
@@ -48,22 +45,20 @@ Each component is designed to integrate with hyperscaler governance boundaries.
 
 BaseLayerOS is designed for:
 
-- hyperscaler governance systems  
-- regulated industry compliance  
-- multi‑model oversight  
-- cross‑cloud execution physics  
-- deterministic agent containment  
+- hyperscaler governance systems
+- regulated industry compliance
+- multi‑model oversight
+- cross‑cloud execution physics
+- deterministic agent containment
 
 This substrate is compatible with:
 
-- Google C.A.G.E.  
-- Microsoft Responsible AI  
-- AWS Bedrock Governance  
+- Google C.A.G.E.
+- Microsoft Responsible AI
+- AWS Bedrock Governance
 
 ## Status
 
-Active development.  
-Zero‑compute burn achieved.  
-Cross‑cloud substrate validated.  
-Deterministic replay engine stable.  
+Active development.
+Deterministic replay engine stable.
 Governance physics proven.
