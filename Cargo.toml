@@ -1,31 +1,8 @@
 [workspace]
 members = [
-    substrate,
-    governance-engines,
-    envelope-standard,
-    console,
-    audit-chain,
-    api,
-    adapters,
+    "crates/substrate",
+    "cli",
+    "workers",
 ]
 
 resolver = "2"
-
-[[bin]]
-name = "baselayeros"
-path = "src/main.rs"
-
-[workspace.package]
-edition = "2021"
-license = "MIT"
-version = "2.0.0"
-authors = ["James Archer-Lewis <fortresscodeai@outlook.com>"]
-
-[workspace.dependencies]
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
-thiserror = "1.0"
-uuid = { version = "1.8", features = ["v4"] }
-chrono = { version = "0.4", features = ["serde"] }
-tracing = "0.1"
-tracing-subscriber = { version = "0.3", features = ["fmt", "env-filter"] }

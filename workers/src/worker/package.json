@@ -1,0 +1,14 @@
+{
+  "name": "baselayeros-substrate",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "tsc",
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "@cloudflare/workers-types": "^4.20241001.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  }
+}

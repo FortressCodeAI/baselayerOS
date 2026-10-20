@@ -1,0 +1,9 @@
+name = "baselayeros-substrate"
+main = "src/index.ts"
+compatibility_date = "2024-10-01"
+
+[build]
+command = "npm install && npm run build"
+
+[vars]
+ENVIRONMENT = "production"

@@ -1,34 +1,61 @@
-# Ignore private crates
-crates/kernel/
-crates/substrate/
-crates/proofs/
-crates/adapters/
-crates/envelopes/
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
 
-# Ignore private physics
-physics/
-private/
-internal/
-enterprise/
-compliance-private/
-datasets/
-configs-private/
-wasm-private/
-rust-private/
-invariants-private/
-rulebooks-private/
+# Virtual envs
+.venv/
+venv/
+env/
 
-# Ignore build artifacts
-target/
-out/
+# Build
+build/
 dist/
-.next/
-node_modules/
+*.egg-info/
+# Coverage
+.coverage
+htmlcov/
+.pytest_cache/
 
-# Ignore UI build artifacts
-ui/dist/
-ui/node_modules/
+# IDE
+.vscode/
+.idea/
 
-# Ignore web build artifacts
-web/out/
-web/node_modules/
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Secrets
+.env
+.env.local
+.env.production
+
+# Tokens
+.pypirc
+
+# Audit artifacts
+audit_chain.backup.json
+
+# Python build artifacts
+*.whl
+*.tar.gz
+
+# MyPy
+.mypy_cache/
+
+# Ruff
+.ruff_cache/
+
+# Temporary files
+*.tmp
+*.bak
+
+# Runtime state
+state.json
+
+# Local config
+config.local.json
