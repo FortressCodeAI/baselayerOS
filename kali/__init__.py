@@ -12,12 +12,12 @@ Public surface:
 - substrate: substrate integration
 """
 
-from .src import core
-from .src import operators
-from .src import neural
-from .src import symbolic
-from .src import councils
-from .src import substrate
+from ..kali import core
+from ..kali import operators
+from ..kali import neural
+from ..kali import symbolic
+from ..kali import councils
+from ..kali import substrate
 
 __all__ = [
     "core",
