@@ -1,5 +1,3 @@
-# kali/councils/router.py
-
 import json
 
 # Safety Council
