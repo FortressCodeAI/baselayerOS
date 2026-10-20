@@ -1,0 +1,7 @@
+capabilities:
+  summarize_stream:
+    allowed: true
+  priority_collapse:
+    allowed: true
+  draft_response:
+    allowed: false

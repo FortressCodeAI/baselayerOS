@@ -1,0 +1,10 @@
+version: 1
+governance:
+  tier: regulated
+  deterministic: true
+  replayable: true
+  audit_chain: true
+  invariants:
+    - no_unsafe_content
+    - capability_must_match
+    - governance_tier_valid

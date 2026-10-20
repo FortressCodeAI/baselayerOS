@@ -1,0 +1,7 @@
+name: myproject
+version: 1.0.0
+description: "A governed Kali operator project."
+capabilities:
+  - summarize_stream
+  - priority_collapse
+  - draft_response

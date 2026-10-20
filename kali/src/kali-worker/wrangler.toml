@@ -1,0 +1,17 @@
+name = "kali-worker"
+main = "src/index.ts"
+compatibility_date = "2024-10-12"
+
+routes = [
+  { pattern = "https://api.kali.run/operator/*", script = "kali-worker" },
+  { pattern = "https://api.kali.run/substrate/*", script = "kali-worker" },
+  { pattern = "https://api.kali.run/neural/*", script = "kali-worker" },
+  { pattern = "https://api.kali.run/symbolic/*", script = "kali-worker" },
+  { pattern = "https://api.kali.run/councils/*", script = "kali-worker" }
+]
+
+[vars]
+BACKEND_URL = "https://kali-backend.onrender.com"
+SUBSTRATE_URL = "https://substrate.baselayeros.ca"
+SUPABASE_URL = "https://yourproject.supabase.co"
+SUPABASE_KEY = "your-supabase-key"

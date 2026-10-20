@@ -1,0 +1,7 @@
+governance:
+  tier: regulated
+  councils:
+    - safety
+    - capability
+    - determinism
+    - compliance

@@ -1,0 +1,15 @@
+[project]
+name = "fortresscodeai-kali"
+version = "1.0.0"
+description = "Governed operator engine"
+requires-python = ">=3.10"
+
+[project.scripts]
+kali = "kali.interfaces.cli.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+packages = ["kali"]
+
+[tool.setuptools.package-data]
+kali = ["**/*.json", "**/*.yaml", "**/*.md"]

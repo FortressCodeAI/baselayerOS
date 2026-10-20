@@ -1,0 +1,59 @@
+[
+  {
+    "previous_hash": "GENESIS",
+    "event": {
+      "action": "summarize_stream",
+      "payload": {
+        "summary": "Kali is a governed operator engine"
+      },
+      "output": {
+        "summary": "Kali is a governed operator engine"
+      }
+    },
+    "entry_hash": "5874ef58f26fb1a5c716657598435f2f0ed4b3787f8929ce57d8d21a17b30a95"
+  },
+  {
+    "previous_hash": "5874ef58f26fb1a5c716657598435f2f0ed4b3787f8929ce57d8d21a17b30a95",
+    "event": {
+      "action": "summarize_stream",
+      "payload": {
+        "summary": "Kali is a governed operator engine"
+      },
+      "output": {
+        "summary": "Kali is a governed operator engine"
+      }
+    },
+    "entry_hash": "d4399a938da3bc4131a79d724ebb842cb3b661ba51cd5abebcb2b842586f8a79"
+  },
+  {
+    "previous_hash": "d4399a938da3bc4131a79d724ebb842cb3b661ba51cd5abebcb2b842586f8a79",
+    "event": {
+      "execution_id": "e3bb9fc1-0933-4c53-aa9d-ff2ad56a551e",
+      "action": "summarize_stream",
+      "payload": {
+        "summary": "Kali is a governed operator engine"
+      },
+      "output": {
+        "summary": "Kali is a governed operator engine"
+      }
+    },
+    "entry_hash": "fa3f7907c95867269d9fd881012945bc5df83bf33fa6845cb509d619422657e7"
+  },
+  {
+    "previous_hash": "fa3f7907c95867269d9fd881012945bc5df83bf33fa6845cb509d619422657e7",
+    "event": {
+      "execution_id": "49e7d603-2cdd-4301-baa4-c0d04190b4b6",
+      "action": "summarize_stream",
+      "payload": {
+        "summary": "Kali is a governed operator engine"
+      },
+      "output": {
+        "summary": "Kali is a governed operator engine"
+      },
+      "rulebook_hash": "40cfe718c6e1f3393b84a3d2ba9d043cf52054fc6434ba40505ecf7d936d1b9e",
+      "execution_hash": "5a76c91095fcb81fb34f80b875c70565f85482722ca8a1263c524ce0d11ba778",
+      "code_version": "1.0.0"
+    },
+    "entry_hash": "3e9ec0a612d8154c1c22072a4fb7c882e17c4b2a286854c6a42aa061d91912f6"
+  }
+]
