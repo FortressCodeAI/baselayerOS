@@ -14,12 +14,12 @@ She is the governed operator that sits on top of BaseLayerOS.
 
 from kali.src.kali.core.config import KaliConfig
 from kali.src.kali.core.logging import get_logger
-from kali.src.kali.interfaces.cli.cli import KaliCLI
+
 from kali.src.kali.symbolic.envelope_builder import EnvelopeBuilder
 from kali.src.kali.symbolic.risk_engine import RiskEngine
 from kali.src.kali.symbolic.capability_engine import CapabilityEngine
 from kali.src.kali.symbolic.hitl_engine import HITLEngine
-from kali.src.kali.symbolic.council_router import CouncilRouter
+from kali.src.kali.symbolic.council_router import evaluate_council
 from kali.src.kali.symbolic.replay_engine import ReplayEngine
 from kali.src.kali.neural.sandbox.sandbox import NeuralSandbox
 from kali.src.kali.operators.governance_operator import GovernanceOperator
@@ -37,8 +37,8 @@ def build_kali_operator() -> GovernanceOperator:
     risk_engine = RiskEngine(config=config, logger=logger)
     capability_engine = CapabilityEngine(config=config, logger=logger)
     hitl_engine = HITLEngine(config=config, logger=logger)
-    council_router = CouncilRouter(config=config, logger=logger)
-    replay_engine = ReplayEngine(config=config, logger=logger)
+    council_router = evaluate_council
+    replay_engine = ReplayEngine()
 
     # Neural sandbox (DeepSeek or other small model)
     neural_sandbox = NeuralSandbox(config=config, logger=logger)
@@ -63,8 +63,7 @@ def main() -> None:
     Entrypoint for Kali CLI.
     """
     operator = build_kali_operator()
-    cli = KaliCLI(operator=operator)
-    cli.run()
+    getattr(operator, "run")()
 
 
 if __name__ == "__main__":
