@@ -3,7 +3,7 @@
 import json
 
 # Safety Council
-from src.symbolic.standards.safety.kali_safety_lv1 import evaluate as safety_lv1
+from src.kali.symbolic.standards.safety.kali_safety_lv1 import evaluate as safety_lv1
 from src.symbolic.standards.safety.kali_safety_lv2 import evaluate as safety_lv2
 from src.symbolic.standards.safety.kali_safety_lv3 import evaluate as safety_lv3
 

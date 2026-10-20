@@ -12,17 +12,17 @@ Kali is NOT the substrate.
 She is the governed operator that sits on top of BaseLayerOS.
 """
 
-from kali.src.core.config import KaliConfig
-from kali.src.core.logging import get_logger
-from kali.src.interfaces.cli.cli import KaliCLI
-from kali.src.symbolic.envelope_builder import EnvelopeBuilder
-from kali.src.symbolic.risk_engine import RiskEngine
-from kali.src.symbolic.capability_engine import CapabilityEngine
-from kali.src.symbolic.hitl_engine import HITLEngine
-from kali.src.symbolic.council_router import CouncilRouter
-from kali.src.symbolic.replay_engine import ReplayEngine
-from kali.src.neural.sandbox.sandbox import NeuralSandbox
-from kali.src.operators.governance_operator import GovernanceOperator
+from kali.src.kali.core.config import KaliConfig
+from kali.src.kali.core.logging import get_logger
+from kali.src.kali.interfaces.cli.cli import KaliCLI
+from kali.src.kali.symbolic.envelope_builder import EnvelopeBuilder
+from kali.src.kali.symbolic.risk_engine import RiskEngine
+from kali.src.kali.symbolic.capability_engine import CapabilityEngine
+from kali.src.kali.symbolic.hitl_engine import HITLEngine
+from kali.src.kali.symbolic.council_router import CouncilRouter
+from kali.src.kali.symbolic.replay_engine import ReplayEngine
+from kali.src.kali.neural.sandbox.sandbox import NeuralSandbox
+from kali.src.kali.operators.governance_operator import GovernanceOperator
 
 
 def build_kali_operator() -> GovernanceOperator:
