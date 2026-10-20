@@ -1,5 +1,3 @@
-import json
-
 # Safety Council
 from kali.src.kali.symbolic.standards.safety.kali_safety_lv1 import evaluate as safety_lv1
 from kali.src.kali.symbolic.standards.safety.kali_safety_lv2 import evaluate as safety_lv2
