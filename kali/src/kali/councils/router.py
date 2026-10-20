@@ -2,29 +2,29 @@
 import json
 
 # Safety Council
-from src.symbolic.standards.safety.kali_safety_lv1 import evaluate as safety_lv1
-from src.symbolic.standards.safety.kali_safety_lv2 import evaluate as safety_lv2
-from src.symbolic.standards.safety.kali_safety_lv3 import evaluate as safety_lv3
+from kali.src.kali.symbolic.standards.safety.kali_safety_lv1 import evaluate as safety_lv1
+from kali.src.kali.symbolic.standards.safety.kali_safety_lv2 import evaluate as safety_lv2
+from kali.src.kali.symbolic.standards.safety.kali_safety_lv3 import evaluate as safety_lv3
 
 # Red Team Council
-from src.symbolic.standards.redteam.kali_redteam_lv1 import evaluate as red_lv1
-from src.symbolic.standards.redteam.kali_redteam_lv2 import evaluate as red_lv2
-from src.symbolic.standards.redteam.kali_redteam_lv3 import evaluate as red_lv3
+from kali.src.kali.symbolic.standards.redteam.kali_redteam_lv1 import evaluate as red_lv1
+from kali.src.kali.symbolic.standards.redteam.kali_redteam_lv2 import evaluate as red_lv2
+from kali.src.kali.symbolic.standards.redteam.kali_redteam_lv3 import evaluate as red_lv3
 
 # Determinism Council
-from src.symbolic.standards.determinism.kali_determinism_lv1 import evaluate as det_lv1
-from src.symbolic.standards.determinism.kali_determinism_lv2 import evaluate as det_lv2
-from src.symbolic.standards.determinism.kali_determinism_lv3 import evaluate as det_lv3
+from kali.src.kali.symbolic.standards.determinism.kali_determinism_lv1 import evaluate as det_lv1
+from kali.src.kali.symbolic.standards.determinism.kali_determinism_lv2 import evaluate as det_lv2
+from kali.src.kali.symbolic.standards.determinism.kali_determinism_lv3 import evaluate as det_lv3
 
 # Compliance Council
-from src.symbolic.standards.compliance.kali_compliance_lv1 import evaluate as comp_lv1
-from src.symbolic.standards.compliance.kali_compliance_lv2 import evaluate as comp_lv2
-from src.symbolic.standards.compliance.kali_compliance_lv3 import evaluate as comp_lv3
+from kali.src.kali.symbolic.standards.compliance.kali_compliance_lv1 import evaluate as comp_lv1
+from kali.src.kali.symbolic.standards.compliance.kali_compliance_lv2 import evaluate as comp_lv2
+from kali.src.kali.symbolic.standards.compliance.kali_compliance_lv3 import evaluate as comp_lv3
 
 # Capability Council
-from src.symbolic.standards.capability.kali_capability_lv1 import evaluate as cap_lv1
-from src.symbolic.standards.capability.kali_capability_lv2 import evaluate as cap_lv2
-from src.symbolic.standards.capability.kali_capability_lv3 import evaluate as cap_lv3
+from kali.src.kali.symbolic.standards.capability.kali_capability_lv1 import evaluate as cap_lv1
+from kali.src.kali.symbolic.standards.capability.kali_capability_lv2 import evaluate as cap_lv2
+from kali.src.kali.symbolic.standards.capability.kali_capability_lv3 import evaluate as cap_lv3
 
 from dataclasses import dataclass
 

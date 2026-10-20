@@ -2,7 +2,7 @@
 
 import hashlib
 import json
-from src.councils.council import evaluate
+from kali.src.kali.councils.council import evaluate
 
 def governance_envelope(payload: dict):
     """
