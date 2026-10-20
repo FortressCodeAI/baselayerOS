@@ -1,4 +1,4 @@
-# Kali-Runtime 1.0.0
+# BaseLayerOS + Kali Governance
 
 ## Governed AI Execution Substrate
 
