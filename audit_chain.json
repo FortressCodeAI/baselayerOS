@@ -1,0 +1,34 @@
+[
+  {
+    "timestamp": "2026-10-21T16:25:04.015573Z",
+    "mode": "SHADOW_OBSERVER",
+    "action_slug": "fetch_public_transit_schedule",
+    "execution_blocked": false,
+    "violations_detected": [],
+    "pii_redacted_in_shadow": false,
+    "payload_hash": "a6dbcac8632a2ce9ff3ba732fc7d71f00f224be84d548766f584d763761860fd"
+  },
+  {
+    "timestamp": "2026-10-21T16:25:04.023150Z",
+    "mode": "SHADOW_OBSERVER",
+    "action_slug": "update_citizen_tax_record",
+    "execution_blocked": false,
+    "violations_detected": [
+      "SHADOW_VIOLATION_MFIPPA_PII_EXPOSED: Unmasked 'citizen_name' detected.",
+      "SHADOW_VIOLATION_MFIPPA_PII_EXPOSED: Unmasked 'ohip' detected.",
+      "SHADOW_VIOLATION_MFIPPA_PII_EXPOSED: Unmasked 'phone' detected.",
+      "SHADOW_VIOLATION_EDSTA_UNAUTHORIZED_WRITE: Direct DB write initiated outside governed boundary."
+    ],
+    "pii_redacted_in_shadow": true,
+    "payload_hash": "ecba5b69983044546570b3c45c4bf123ba96f0a3a56fd384ef5527bfba1e9bed"
+  },
+  {
+    "timestamp": "2026-10-21T16:25:04.048146Z",
+    "mode": "SHADOW_OBSERVER",
+    "action_slug": "log_municipal_inquiry",
+    "execution_blocked": false,
+    "violations_detected": [],
+    "pii_redacted_in_shadow": false,
+    "payload_hash": "3d99a712b3a2407b7d82022efae91036fe095ef6a92377f0c126f62e6ddfbced"
+  }
+]

@@ -1,139 +1,55 @@
 import json
-import os
-from datetime import datetime, timezone
-from typing import Any, Dict, List
-
-# Adjust these imports depending on your internal package layout, 
-# or keep them self-contained if these modules are elsewhere.
-try:
-    from kali.governance.engine import GovernanceEngine
-    from kali.runtime.engine import RuntimeEngine
-    from kali.core.proofs.engine import ProofEngine
-    from kali.audit.ledger import AuditLedger
-except ImportError:
-    # Fallback placeholders if modular imports are structured differently in your src folder
-    GovernanceEngine = None
-    RuntimeEngine = None
-    ProofEngine = None
-    AuditLedger = None
-
+from ..core.envelope import ExecutionEnvelope
+from ..runtime.baselayer_bridge import BaseLayerOSBridge
+"""
+Kali Engine Package
+"""
 
 class KaliVetoError(Exception):
-    """Raised when Councilor Zero or active departments veto an action in Enforce mode."""
+    """Raised when a governance policy vetoes or blocks an execution."""
     pass
-
-
-class KaliRuntime:
-    """
-    Manages runtime execution modes (shadow vs. enforce), active council 
-    deliberations (including Councilor Zero), and audit trace logging.
-    """
-    def __init__(self, mode: str = "shadow", log_path: str = "./audit_trace.jsonl"):
-        self.mode = mode.lower()  # "shadow" or "enforce"
-        self.log_path = log_path
-
-    def evaluate_councils(self, execution) -> List[Dict[str, Any]]:
-        verdicts = []
-        action_slug = getattr(execution, "action_slug", str(execution))
-        arguments = getattr(execution, "arguments", {})
-
-        # 1. Security Department
-        if "eval" in str(arguments) or "exec" in str(arguments):
-            verdicts.append({"department": "Security Department", "passed": False, "reason": "Dynamic code execution pattern detected."})
-        else:
-            verdicts.append({"department": "Security Department", "passed": True, "reason": "Payload verified."})
-
-        # 2. Finance / Resource Department
-        if action_slug == "transfer_funds" and arguments.get("amount", 0) > 10000:
-            verdicts.append({"department": "Finance Council", "passed": False, "reason": "Transaction exceeds autonomous limit."})
-        else:
-            verdicts.append({"department": "Finance Council", "passed": True, "reason": "Within financial thresholds."})
-
-        # 3. Councilor Zero (Adversarial Red-Team Veto)
-        dangerous_tools = ["drop_database", "rm_rf", "exfiltrate_data", "bypass_kernel"]
-        if action_slug in dangerous_tools:
-            verdicts.append({"department": "Councilor Zero", "passed": False, "reason": f"Critical invariant breach on '{action_slug}'. Absolute veto."})
-        else:
-            verdicts.append({"department": "Councilor Zero", "passed": True, "reason": "No adversarial vectors identified."})
-
-        return verdicts
-
-    def evaluate(self, agent_id, tool_name, arguments):
-        ...
-
-
 class KaliEngine:
-    def __init__(self, mode: str = "shadow", log_path: str = "./audit_trace.jsonl"):
-        self.runtime_env = KaliRuntime(mode=mode, log_path=log_path)
-        self.governance = GovernanceEngine() if GovernanceEngine else None
-        self.runtime = RuntimeEngine() if RuntimeEngine else None
-        self.audit = AuditLedger() if AuditLedger else None
+    def __init__(self, mode: str = "shadow", log_path: str = "./src/kali/audit/audit_chain.json"):
+        self.mode = mode.lower()
+        self.log_path = log_path
+        self.baselayer_bridge = BaseLayerOSBridge()
 
-    def execute(self, execution):
-        gov_decision = self.governance.evaluate(execution) if self.governance else {"allowed": True}
-        council_verdicts = self.runtime_env.evaluate_councils(execution)
-        
-        failed_council = next((v for v in council_verdicts if not v["passed"]), None)
-        gov_allowed = gov_decision.get("allowed", True)
-        councils_passed = failed_council is None
-        
-        is_allowed = gov_allowed and councils_passed
-        
-        timestamp = datetime.now(timezone.utc).isoformat()
-        execution_id = getattr(execution, "execution_id", "unknown")
-        action_slug = getattr(execution, "action_slug", "unknown")
+    def process_plan_and_execute(self, plan_id: str, action_slug: str, action_args: dict) -> dict:
+        print(f"🧠 [Kali] Planning & governance verification for plan '{plan_id}'...")
 
-        if is_allowed:
-            status, action_taken = "PASSED", "allowed"
-        elif self.runtime_env.mode == "shadow":
-            status, action_taken = "VIOLATION_DETECTED", "shadow_allowed"
-        else:
-            status, action_taken = "VIOLATION_BLOCKED", "vetoed_by_councilor_zero"
+        # 1. Create Envelope for BaseLayerOS
+        envelope = ExecutionEnvelope(
+            plan_id=plan_id,
+            action_slug=action_slug,
+            arguments=action_args,
+            mode=self.mode
+        )
 
-        log_entry = {
-            "timestamp": timestamp,
-            "execution_id": execution_id,
-            "action": action_slug,
-            "policy_status": status,
-            "mode": self.runtime_env.mode,
-            "action_taken": action_taken,
-            "reason": failed_council["reason"] if failed_council else gov_decision.get("reason", "All invariants satisfied"),
-            "councils": council_verdicts
-        }
-        self._write_audit_log(log_entry)
+        print(f"📦 [Kali] Created execution envelope {envelope.envelope_id}. Handing over to BaseLayerOS Substrate...")
 
-        if status == "VIOLATION_BLOCKED":
-            reason = failed_council["reason"] if failed_council else "Governance policy violation"
-            raise KaliVetoError(f"🛡️ KERNEL VETO: {reason}")
+        # 2. Hand Off Execution to BaseLayerOS
+        execution_response = self.baselayer_bridge.execute_envelope(envelope)
 
-        result = self.runtime.execute(execution) if self.runtime else {"result": "executed"}
+        # 3. Log Audit Trace Back to Kali Ledger
+        self._write_audit_chain(execution_response["audit_trace"])
 
-        execution_hash = ProofEngine.execution_hash(execution, result) if ProofEngine else "mock_hash"
-        audit_hash = self.audit.record({
-            "execution_id": execution_id,
-            "action": action_slug,
-            "mode": self.runtime_env.mode,
-            "governance_passed": is_allowed,
-            "hash": execution_hash
-        }) if self.audit else "mock_audit_hash"
+        print(f"✅ [Kali] Execution complete. Audit trace logged to {self.log_path}.")
 
         return {
-            "status": "executed" if is_allowed else "shadow_executed",
-            "mode": self.runtime_env.mode,
-            "execution_id": execution_id,
-            "result": result,
-            "decision": {
-                "allowed": is_allowed,
-                "governance": gov_decision,
-                "councils": council_verdicts
-            },
-            "proofs": {
-                "execution_hash": execution_hash,
-                "audit_hash": audit_hash
-            }
+            "status": "SUCCESS",
+            "execution_result": execution_response["result"],
+            "audit_trace": execution_response["audit_trace"]
         }
 
-    def _write_audit_log(self, entry: Dict[str, Any]):
-        os.makedirs(os.path.dirname(os.path.abspath(self.runtime_env.log_path)), exist_ok=True)
-        with open(self.runtime_env.log_path, "a") as f:
-            f.write(json.dumps(entry) + "\n")
+    def _write_audit_chain(self, audit_trace: dict):
+        """Appends audit trace to persistent JSON ledger."""
+        try:
+            with open(self.log_path, "r") as f:
+                chain = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            chain = []
+
+        chain.append(audit_trace)
+
+        with open(self.log_path, "w") as f:
+            json.dump(chain, f, indent=2)

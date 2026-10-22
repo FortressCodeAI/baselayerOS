@@ -1,4 +1,4 @@
-from kali.runtime.registry import resolve
+from kali.src.kali.runtime.registry import resolve
 
 
 class RuntimeEngine:
@@ -15,3 +15,19 @@ class RuntimeEngine:
         return fn(
             execution.payload
         )
+
+        payload = getattr(
+            execution, 
+            "payload", 
+            getattr(execution, "arguments", {})
+        )
+        
+        # If execution is a raw dict instead of an object:
+        if isinstance(execution, dict):
+            payload = execution.get("payload", execution.get("arguments", {}))
+
+        # Rest of your runtime execution logic...
+        return {
+            "status": "executed",
+            "payload_processed": payload
+        }

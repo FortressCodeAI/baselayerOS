@@ -1,0 +1,3 @@
+# Kali Governance Configuration
+mode = "shadow"
+log_destination = "./audit_trace.jsonl"

@@ -2,8 +2,15 @@ import argparse
 import sys
 import json
 from pathlib import Path
-from kali.engine import KaliVetoError
-from kali.engine import KaliRuntime
+from kali.engine import KaliEngine, KaliVetoError
+
+class CLIExecution:
+    def __init__(self, action_slug: str, arguments: dict):
+        self.execution_id = f"exec-{action_slug}-001"
+        self.action_slug = action_slug
+        self.arguments = arguments
+
+DEFAULT_AUDIT_LOG = "./src/kali/audit/audit_chain.json"
 
 def main():
     parser = argparse.ArgumentParser(
@@ -21,7 +28,7 @@ def main():
     sub.add_parser("init", help="Initialize a default kali.toml configuration template")
     sub.add_parser("login", help="Authenticate with the BaseLayerOS governance registry")
 
-    new_cmd = sub.add_parser("new", help=" Scaffold a new governed agent project")
+    new_cmd = sub.add_parser("new", help="Scaffold a new governed agent project")
     new_cmd.add_argument("name", help="Project directory name")
 
     run_cmd = sub.add_parser("run", help="Execute an agent script or workflow under runtime governance")
@@ -34,7 +41,7 @@ def main():
     )
 
     logs_parser = sub.add_parser("logs", help="Inspect audit trace logs and temporal history")
-    logs_parser.add_argument("-f", "--file", default="./audit_trace.jsonl", help="Path to audit log file")
+    logs_parser.add_argument("-f", "--file", default=DEFAULT_AUDIT_LOG, help=f"Path to audit log file (default: {DEFAULT_AUDIT_LOG})")
     logs_parser.add_argument("-l", "--limit", type=int, default=10, help="Number of log entries to display")
 
     sub.add_parser("status", help="Check live runtime and council health status")
@@ -70,19 +77,22 @@ def init_project_config():
     if config_path.exists():
         print("⚠️ kali.toml already exists.")
         return
-    content = '# Kali Governance Configuration\nmode = "shadow"\nlog_destination = "./audit_trace.jsonl"\n'
+    content = f'# Kali Governance Configuration\nmode = "shadow"\nlog_destination = "{DEFAULT_AUDIT_LOG}"\n'
     config_path.write_text(content)
     print("✨ Created kali.toml configuration template.")
 
 def run_operator_script(file_path: str, mode: str):
     print(f"🚀 Executing {file_path} under Kali runtime [Mode: {mode.upper()}]...")
-    runtime = KaliRuntime(mode=mode)
+    
+    # Direct engine to log trace directly to the audit chain ledger location
+    engine = KaliEngine(mode=mode, log_path=DEFAULT_AUDIT_LOG)
+    execution = CLIExecution(action_slug="execute_operator_script", arguments={"file": file_path})
+
     try:
-        # Simulated execution hook for runtime validation
-        runtime.evaluate(agent_id="cli-operator", tool_name="standard_execution", arguments={"file": file_path})
-        print("✅ Execution completed successfully. Trace recorded.")
+        result = engine.execute(execution)
+        print(f"✅ Execution completed. Status: {result['status'].upper()} | Trace recorded to {DEFAULT_AUDIT_LOG}")
     except KaliVetoError as e:
-        print(f"🚨 Execution halted: {e}")
+        print(f"🚨 Execution halted by Kernel Veto: {e}")
         sys.exit(1)
 
 def print_audit_logs(path: str, limit: int):
@@ -91,12 +101,12 @@ def print_audit_logs(path: str, limit: int):
             lines = f.readlines()
         total = len(lines)
         start = max(0, total - limit)
-        print(f"\n📜 Audit Trace Logs ({path}):\n" + "─" * 50)
+        print(f"\n📜 Audit Chain Logs ({path}):\n" + "─" * 60)
         for line in lines[start:]:
             entry = json.loads(line.strip())
             icon = "✅" if entry.get("policy_status") == "PASSED" else "🚨"
-            print(f"{icon} [{entry.get('timestamp')}] Tool: {entry.get('tool_name')} | Status: {entry.get('policy_status')} | Action: {entry.get('action_taken')}")
-        print("─" * 50)
+            print(f"{icon} [{entry.get('timestamp')}] Action: {entry.get('action')} | Status: {entry.get('policy_status')} | Mode: {entry.get('mode')}")
+        print("─" * 60)
     except FileNotFoundError:
         print(f"⚠️ No audit trace logs found at {path}.")
 

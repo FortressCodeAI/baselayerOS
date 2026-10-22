@@ -56,4 +56,5 @@
     },
     "entry_hash": "3e9ec0a612d8154c1c22072a4fb7c882e17c4b2a286854c6a42aa061d91912f6"
   }
-]
+]{"timestamp": "2026-10-20T17:36:57.437059+00:00", "execution_id": "exec-execute_operator_script-001", "action": "execute_operator_script", "policy_status": "PASSED", "mode": "shadow", "action_taken": "allowed", "reason": "All invariants satisfied", "councils": []}
+{"timestamp": "2026-10-20T22:22:31.440542+00:00", "execution_id": "exec-execute_operator_script-001", "action": "execute_operator_script", "policy_status": "PASSED", "mode": "shadow", "action_taken": "allowed", "reason": "All invariants satisfied", "councils": []}
